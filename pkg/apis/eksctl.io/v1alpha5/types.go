@@ -2,6 +2,7 @@ package v1alpha5
 
 import (
 	"fmt"
+	"k8s.io/kops/util/pkg/slice"
 	"strings"
 	"time"
 
@@ -435,6 +436,21 @@ func (c *ClusterConfig) AppendAvailabilityZone(newAZ string) {
 		}
 	}
 	c.AvailabilityZones = append(c.AvailabilityZones, newAZ)
+}
+
+// CleanupSubnets clean up subnet entries having invalid AZ
+func (c *ClusterConfig) CleanupSubnets() {
+	for id := range c.VPC.Subnets.Private {
+		if !slice.Contains(c.AvailabilityZones, id) {
+			delete(c.VPC.Subnets.Private, id)
+		}
+	}
+
+	for id, _ := range c.VPC.Subnets.Public {
+		if !slice.Contains(c.AvailabilityZones, id) {
+			delete(c.VPC.Subnets.Public, id)
+		}
+	}
 }
 
 // NewNodeGroup creates new nodegroup, and returns pointer to it
