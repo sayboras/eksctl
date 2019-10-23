@@ -446,7 +446,7 @@ func (c *ClusterConfig) CleanupSubnets() {
 		}
 	}
 
-	for id, _ := range c.VPC.Subnets.Public {
+	for id := range c.VPC.Subnets.Public {
 		if !slice.Contains(c.AvailabilityZones, id) {
 			delete(c.VPC.Subnets.Public, id)
 		}
