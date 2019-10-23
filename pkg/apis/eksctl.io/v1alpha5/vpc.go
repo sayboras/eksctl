@@ -109,6 +109,12 @@ func (c *ClusterConfig) PublicSubnetIDs() []string {
 	return subnets
 }
 
+// ClearSubnets clears all the subnets. Used before ImportSubnet.
+func (c *ClusterConfig) ClearAllSubnets() {
+	c.VPC.Subnets.Public = make(map[string]Network)
+	c.VPC.Subnets.Private = make(map[string]Network)
+}
+
 // ImportSubnet loads a given subnet into cluster config
 func (c *ClusterConfig) ImportSubnet(topology SubnetTopology, az, subnetID, cidr string) error {
 	if c.VPC.Subnets == nil {

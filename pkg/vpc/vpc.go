@@ -185,6 +185,10 @@ func ImportSubnets(provider api.ClusterProvider, spec *api.ClusterConfig, topolo
 			return err
 		}
 	}
+
+	if len(subnets) > 0 {
+		spec.ClearAllSubnets()
+	}
 	for _, subnet := range subnets {
 		if spec.VPC.ID == "" {
 			// if VPC wasn't defined, import it based on VPC of the first
