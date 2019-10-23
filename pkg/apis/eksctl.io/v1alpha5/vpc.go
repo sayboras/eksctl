@@ -109,7 +109,7 @@ func (c *ClusterConfig) PublicSubnetIDs() []string {
 	return subnets
 }
 
-// ClearSubnets clears all the subnets. Used before ImportSubnet.
+// ClearAllSubnets clears all the subnets. Used before calling ImportSubnet.
 func (c *ClusterConfig) ClearAllSubnets() {
 	c.VPC.Subnets.Public = make(map[string]Network)
 	c.VPC.Subnets.Private = make(map[string]Network)
