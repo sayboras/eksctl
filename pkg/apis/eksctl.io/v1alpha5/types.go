@@ -2,9 +2,10 @@ package v1alpha5
 
 import (
 	"fmt"
-	"k8s.io/kops/util/pkg/slice"
 	"strings"
 	"time"
+
+	"k8s.io/kops/util/pkg/slice"
 
 	"github.com/aws/aws-sdk-go/service/cloudformation/cloudformationiface"
 	"github.com/aws/aws-sdk-go/service/cloudtrail/cloudtrailiface"
