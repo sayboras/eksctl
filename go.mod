@@ -64,7 +64,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.3.2
 	github.com/spotinst/spotinst-sdk-go v0.0.0-20181012192533-fed4677dbf8f // indirect
-	github.com/stretchr/testify v1.3.0
+	github.com/stretchr/testify v1.4.0
 	github.com/tidwall/gjson v1.1.3
 	github.com/tidwall/match v1.0.0 // indirect
 	github.com/tidwall/sjson v1.0.2
