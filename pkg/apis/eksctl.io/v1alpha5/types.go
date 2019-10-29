@@ -5,8 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"k8s.io/kops/util/pkg/slice"
-
 	"github.com/aws/aws-sdk-go/service/cloudformation/cloudformationiface"
 	"github.com/aws/aws-sdk-go/service/cloudtrail/cloudtrailiface"
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
@@ -437,21 +435,6 @@ func (c *ClusterConfig) AppendAvailabilityZone(newAZ string) {
 		}
 	}
 	c.AvailabilityZones = append(c.AvailabilityZones, newAZ)
-}
-
-// CleanupSubnets clean up subnet entries having invalid AZ
-func (c *ClusterConfig) CleanupSubnets() {
-	for id := range c.VPC.Subnets.Private {
-		if !slice.Contains(c.AvailabilityZones, id) {
-			delete(c.VPC.Subnets.Private, id)
-		}
-	}
-
-	for id := range c.VPC.Subnets.Public {
-		if !slice.Contains(c.AvailabilityZones, id) {
-			delete(c.VPC.Subnets.Public, id)
-		}
-	}
 }
 
 // NewNodeGroup creates new nodegroup, and returns pointer to it

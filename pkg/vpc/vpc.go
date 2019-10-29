@@ -2,6 +2,7 @@ package vpc
 
 import (
 	"fmt"
+	"k8s.io/kops/util/pkg/slice"
 	"strings"
 
 	"github.com/kris-nova/logger"
@@ -202,7 +203,7 @@ func ImportSubnets(provider api.ClusterProvider, spec *api.ClusterConfig, topolo
 		}
 		spec.AppendAvailabilityZone(*subnet.AvailabilityZone)
 	}
-	spec.CleanupSubnets()
+	cleanupSubnets(spec)
 	return nil
 }
 
@@ -258,4 +259,19 @@ func UseEndpointAccessFromCluster(provider api.ClusterProvider, spec *api.Cluste
 	spec.VPC.ClusterEndpoints.PublicAccess = output.Cluster.ResourcesVpcConfig.EndpointPublicAccess
 	spec.VPC.ClusterEndpoints.PrivateAccess = output.Cluster.ResourcesVpcConfig.EndpointPrivateAccess
 	return nil
+}
+
+// cleanupSubnets clean up subnet entries having invalid AZ
+func cleanupSubnets(spec *api.ClusterConfig) {
+	for id := range spec.VPC.Subnets.Private {
+		if !slice.Contains(spec.AvailabilityZones, id) {
+			delete(spec.VPC.Subnets.Private, id)
+		}
+	}
+
+	for id := range spec.VPC.Subnets.Public {
+		if !slice.Contains(spec.AvailabilityZones, id) {
+			delete(spec.VPC.Subnets.Public, id)
+		}
+	}
 }
