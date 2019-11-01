@@ -2,8 +2,9 @@ package vpc
 
 import (
 	"fmt"
-	"k8s.io/kops/util/pkg/slice"
 	"strings"
+
+	"k8s.io/kops/util/pkg/slice"
 
 	"github.com/kris-nova/logger"
 
