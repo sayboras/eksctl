@@ -91,7 +91,7 @@ require (
 	k8s.io/client-go v11.0.0+incompatible
 	k8s.io/code-generator v0.0.0-20190831074504-732c9ca86353
 	k8s.io/csi-api v0.0.0-20190301175547-a37926bd2215 // indirect
-	k8s.io/helm v2.13.1+incompatible
+	k8s.io/helm v2.16.0+incompatible
 	k8s.io/kops v0.0.0-20190222135932-278e6606534e
 	k8s.io/kubelet v0.0.0-20190313123811-3556bcde9670
 	k8s.io/kubernetes v1.12.6
