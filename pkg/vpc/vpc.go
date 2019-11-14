@@ -150,7 +150,7 @@ func Import(provider api.ClusterProvider, spec *api.ClusterConfig, id string) er
 	if spec.VPC.ID == "" {
 		spec.VPC.ID = *vpc.VpcId
 	} else if spec.VPC.ID != *vpc.VpcId {
-		return fmt.Errorf("VPC ID %q is the same as not %q", spec.VPC.ID, *vpc.VpcId)
+		return fmt.Errorf("VPC ID %q is not the same as %q", spec.VPC.ID, *vpc.VpcId)
 	}
 	if spec.VPC.CIDR == nil {
 		spec.VPC.CIDR, err = ipnet.ParseCIDR(*vpc.CidrBlock)

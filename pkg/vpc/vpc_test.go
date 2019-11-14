@@ -2,6 +2,8 @@ package vpc
 
 import (
 	"errors"
+	"fmt"
+	"github.com/aws/aws-sdk-go/service/ec2"
 
 	"github.com/aws/aws-sdk-go/service/eks"
 
@@ -21,6 +23,14 @@ type endpointAccessCase struct {
 	Public      bool
 	DCOutput    *eks.DescribeClusterOutput
 	Error       error
+}
+
+type importVPCCase struct {
+	Cfg               *api.ClusterConfig
+	ID                string
+	DescribeVPCOutput *ec2.DescribeVpcsOutput
+	DescribeVPCError  error
+	Error             error
 }
 
 var (
@@ -58,12 +68,11 @@ var _ = Describe("VPC Endpoints", func() {
 
 			err := UseEndpointAccessFromCluster(p, cfg)
 			if err != nil {
-				Expect(err.Error() == eks.ErrCodeResourceNotFoundException)
+				Expect(err.Error()).To(Equal(eks.ErrCodeResourceNotFoundException))
+			} else {
+				Expect(cfg.VPC.ClusterEndpoints.PrivateAccess).To(Equal(&e.Private))
+				Expect(cfg.VPC.ClusterEndpoints.PublicAccess).To(Equal(&e.Public))
 			}
-
-			Expect(err == nil)
-			Expect(cfg.VPC.ClusterEndpoints.PrivateAccess == &e.Private)
-			Expect(cfg.VPC.ClusterEndpoints.PublicAccess == &e.Public)
 		},
 		Entry("Private=false, Public=true", endpointAccessCase{
 			ClusterName: "false-true-cluster",
@@ -87,11 +96,89 @@ var _ = Describe("VPC Endpoints", func() {
 			Error:       nil,
 		}),
 		Entry("Private=false, Public=false", endpointAccessCase{
-			ClusterName: "notFouncCluster",
+			ClusterName: "notFoundCluster",
 			Private:     false,
 			Public:      false,
 			DCOutput:    nil,
 			Error:       errors.New(eks.ErrCodeResourceNotFoundException),
 		}),
 	)
+
+	DescribeTable("can import VPC",
+		func(vpcCase importVPCCase) {
+			p.MockEC2()
+
+			mockResultFn := func(_ *ec2.DescribeVpcsInput) *ec2.DescribeVpcsOutput {
+				return vpcCase.DescribeVPCOutput
+			}
+
+			p.MockEC2().On("DescribeVpcs", MatchedBy(func(input *ec2.DescribeVpcsInput) bool {
+				return input != nil
+			})).Return(mockResultFn, vpcCase.DescribeVPCError)
+
+			err := Import(p, vpcCase.Cfg, vpcCase.ID)
+			if err != nil {
+				Expect(err.Error()).To(Equal(vpcCase.Error.Error()))
+			} else {
+				Expect(cfg.VPC.ID == vpcCase.ID)
+			}
+		},
+		Entry("VPC with valid details", importVPCCase{
+			Cfg: api.NewClusterConfig(),
+			ID:  "validID",
+			DescribeVPCOutput: &ec2.DescribeVpcsOutput{
+				Vpcs: []*ec2.Vpc{
+					{
+						CidrBlock: stringPointer("192.168.0.0/16"),
+						VpcId:     stringPointer("validID"),
+					},
+				},
+			},
+			DescribeVPCError: nil,
+			Error:            nil,
+		}),
+		Entry("VPC with invalid id", importVPCCase{
+			Cfg:              api.NewClusterConfig(),
+			ID:               "invalidID",
+			DescribeVPCError: errors.New("unable to describe vpc"),
+			Error:            errors.New("unable to describe vpc"),
+		}),
+		Entry("VPC with ID mismatch", importVPCCase{
+			Cfg: &api.ClusterConfig{
+				VPC: &api.ClusterVPC{
+					Network: api.Network{
+						ID: "anotherID",
+					},
+				},
+			},
+			ID: "validID",
+			DescribeVPCOutput: &ec2.DescribeVpcsOutput{
+				Vpcs: []*ec2.Vpc{
+					{
+						VpcId: stringPointer("validID"),
+					},
+				},
+			},
+			DescribeVPCError: nil,
+			Error:            fmt.Errorf("VPC ID %q is not the same as %q", "anotherID", "validID"),
+		}),
+		Entry("VPC with CIDR mismatch", importVPCCase{
+			Cfg: api.NewClusterConfig(),
+			ID:  "validID",
+			DescribeVPCOutput: &ec2.DescribeVpcsOutput{
+				Vpcs: []*ec2.Vpc{
+					{
+						CidrBlock: stringPointer("10.168.0.0/16"),
+						VpcId:     stringPointer("validID"),
+					},
+				},
+			},
+			DescribeVPCError: nil,
+			Error:            fmt.Errorf("VPC CIDR block %q is not the same as %q", "192.168.0.0/16", "10.168.0.0/16"),
+		}),
+	)
 })
+
+func stringPointer(s string) *string {
+	return &s
+}
