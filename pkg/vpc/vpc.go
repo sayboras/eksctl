@@ -100,7 +100,7 @@ func UseFromCluster(provider api.ClusterProvider, stack *cfn.Stack, spec *api.Cl
 	spec.VPC.CIDR = nil
 
 	// Cluster Endpoint Access isn't part of the EKS CloudFormation Cluster stack at this point
-	// Retrieve the current confiugration via the SDK
+	// Retrieve the current configuration via the SDK
 	if err := UseEndpointAccessFromCluster(provider, spec); err != nil {
 		return err
 	}
@@ -188,21 +188,21 @@ func ImportSubnets(provider api.ClusterProvider, spec *api.ClusterConfig, topolo
 		}
 	}
 
-	for _, subnet := range subnets {
+	for _, sn := range subnets {
 		if spec.VPC.ID == "" {
 			// if VPC wasn't defined, import it based on VPC of the first
-			// subnet that we have
-			if err := Import(provider, spec, *subnet.VpcId); err != nil {
+			// sn that we have
+			if err := Import(provider, spec, *sn.VpcId); err != nil {
 				return err
 			}
-		} else if spec.VPC.ID != *subnet.VpcId { // be sure to use the same VPC
-			return fmt.Errorf("given %s is in %s, not in %s", *subnet.SubnetId, *subnet.VpcId, spec.VPC.ID)
+		} else if spec.VPC.ID != *sn.VpcId { // be sure to use the same VPC
+			return fmt.Errorf("given %s is in %s, not in %s", *sn.SubnetId, *sn.VpcId, spec.VPC.ID)
 		}
 
-		if err := spec.ImportSubnet(topology, *subnet.AvailabilityZone, *subnet.SubnetId, *subnet.CidrBlock); err != nil {
+		if err := spec.ImportSubnet(topology, *sn.AvailabilityZone, *sn.SubnetId, *sn.CidrBlock); err != nil {
 			return err
 		}
-		spec.AppendAvailabilityZone(*subnet.AvailabilityZone)
+		spec.AppendAvailabilityZone(*sn.AvailabilityZone)
 	}
 	return nil
 }
