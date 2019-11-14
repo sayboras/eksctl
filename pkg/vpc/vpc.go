@@ -204,7 +204,6 @@ func ImportSubnets(provider api.ClusterProvider, spec *api.ClusterConfig, topolo
 		}
 		spec.AppendAvailabilityZone(*subnet.AvailabilityZone)
 	}
-	cleanupSubnets(spec)
 	return nil
 }
 
@@ -240,7 +239,7 @@ func ImportAllSubnets(provider api.ClusterProvider, spec *api.ClusterConfig) err
 	if err := ImportSubnetsFromList(provider, spec, api.SubnetTopologyPublic, spec.PublicSubnetIDs()); err != nil {
 		return err
 	}
-
+	cleanupSubnets(spec)
 	return nil
 }
 
