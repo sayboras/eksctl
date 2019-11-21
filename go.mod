@@ -7,7 +7,7 @@ go 1.12
 require (
 	github.com/MakeNowJust/heredoc v0.0.0-20171113091838-e9091a26100e // indirect
 	github.com/alecthomas/jsonschema v0.0.0-20190530235721-fd8d96416671
-	github.com/aws/aws-sdk-go v1.25.36
+	github.com/aws/aws-sdk-go v1.25.39
 	github.com/awslabs/goformation v0.0.0-20190320125420-ac0a17860cf1
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/christopherhein/go-version v0.0.0-20180807222509-fee8dd1f7c24
