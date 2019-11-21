@@ -7,7 +7,7 @@ go 1.12
 require (
 	github.com/MakeNowJust/heredoc v0.0.0-20171113091838-e9091a26100e // indirect
 	github.com/alecthomas/jsonschema v0.0.0-20190530235721-fd8d96416671
-	github.com/aws/aws-sdk-go v1.23.15
+	github.com/aws/aws-sdk-go v1.25.36
 	github.com/awslabs/goformation v0.0.0-20190320125420-ac0a17860cf1
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/christopherhein/go-version v0.0.0-20180807222509-fee8dd1f7c24
@@ -25,6 +25,7 @@ require (
 	github.com/fluxcd/flux v1.15.0
 	github.com/fluxcd/helm-operator v1.0.0-rc2
 	github.com/go-ini/ini v1.37.0 // indirect
+	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gobuffalo/envy v1.7.0 // indirect
 	github.com/gobwas/glob v0.2.3
 	github.com/gofrs/flock v0.7.1 // indirect
@@ -104,7 +105,7 @@ replace (
 	github.com/Azure/go-autorest => github.com/Azure/go-autorest v10.14.0+incompatible
 	// Needed due to to Sirupsen/sirupsen case clash
 	github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.4.2
-	github.com/aws/aws-sdk-go => ./lib/github.com/aws/aws-sdk-go
+	github.com/aws/aws-sdk-go => github.com/weaveworks-experiments/aws-sdk-go v1.25.14-0.20191118174145-b6a927b24aa9
 	github.com/awslabs/goformation => github.com/errordeveloper/goformation v0.0.0-20190507151947-a31eae35e596
 	// Override version since auto-detected one fails with GOPROXY
 	github.com/census-instrumentation/opencensus-proto => github.com/census-instrumentation/opencensus-proto v0.2.0

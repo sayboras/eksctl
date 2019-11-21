@@ -10,4 +10,4 @@
 
 ## Bug fixes
 
-- lowercased, user-focused description of the bugfix (#0)
+- lowercased, user-focused description of the improvement (#0)
