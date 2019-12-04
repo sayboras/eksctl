@@ -63,7 +63,7 @@ require (
 	github.com/spf13/cobra v0.0.4
 
 	github.com/spf13/pflag v1.0.5
-	github.com/spf13/viper v1.3.2
+	github.com/spf13/viper v1.5.0
 	github.com/spotinst/spotinst-sdk-go v0.0.0-20181012192533-fed4677dbf8f // indirect
 	github.com/stretchr/testify v1.3.0
 	github.com/tidwall/gjson v1.1.3
