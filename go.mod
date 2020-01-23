@@ -30,7 +30,7 @@ require (
 	github.com/gobuffalo/envy v1.7.0 // indirect
 	github.com/gobwas/glob v0.2.3
 	github.com/gofrs/flock v0.7.1 // indirect
-	github.com/gohugoio/hugo v0.55.6
+	github.com/gohugoio/hugo v0.63.0
 	github.com/golangci/golangci-lint v1.21.0
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
 	github.com/goreleaser/goreleaser v0.110.0
