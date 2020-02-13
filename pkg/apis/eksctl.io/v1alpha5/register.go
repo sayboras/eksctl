@@ -1,12 +1,12 @@
 package v1alpha5
 
 import (
+	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io"
+	v1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/kubernetes/scheme"
-
-	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io"
 )
 
 // Conventional Kubernetes API contants
@@ -43,5 +43,11 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&ClusterConfigList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
+	scheme.AddKnownTypeWithName(
+		schema.GroupVersionKind{
+			Group:   "apps",
+			Kind:    v1.DaemonSet{}.Kind,
+			Version: runtime.APIVersionInternal},
+		&v1.DaemonSet{})
 	return nil
 }

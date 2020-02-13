@@ -16,9 +16,8 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/cli-runtime/pkg/genericclioptions/resource"
+	"k8s.io/cli-runtime/pkg/resource"
 	"k8s.io/client-go/discovery"
 	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -110,7 +109,7 @@ func (c *RawClient) new() (*RawClient, error) {
 		c.config.APIPath = "/api"
 	}
 	if c.config.NegotiatedSerializer == nil {
-		c.config.NegotiatedSerializer = &serializer.DirectCodecFactory{CodecFactory: scheme.Codecs}
+		c.config.NegotiatedSerializer = &scheme.Codecs
 	}
 
 	if err := restclient.SetKubernetesDefaults(c.config); err != nil {

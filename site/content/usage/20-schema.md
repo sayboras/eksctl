@@ -236,6 +236,9 @@ FargateProfileSelector:
   required:
   - namespace
   type: object
+FieldsV1:
+  additionalProperties: false
+  type: object
 IPNet:
   additionalProperties: false
   properties:
@@ -250,37 +253,22 @@ IPNet:
   - IP
   - Mask
   type: object
-Initializer:
+ManagedFieldsEntry:
   additionalProperties: false
   properties:
-    name:
+    apiVersion:
       type: string
-  required:
-  - name
-  type: object
-Initializers:
-  additionalProperties: false
-  properties:
-    pending:
-      items:
-        $ref: '#/definitions/Initializer'
-        $schema: http://json-schema.org/draft-04/schema#
-      type: array
-    result:
-      $ref: '#/definitions/Status'
+    fieldsType:
+      type: string
+    fieldsV1:
+      $ref: '#/definitions/FieldsV1'
       $schema: http://json-schema.org/draft-04/schema#
-  required:
-  - pending
-  type: object
-ListMeta:
-  additionalProperties: false
-  properties:
-    continue:
+    manager:
       type: string
-    resourceVersion:
+    operation:
       type: string
-    selfLink:
-      type: string
+    time:
+      $ref: '#/definitions/Time'
   type: object
 ManagedNodeGroup:
   additionalProperties: false
@@ -550,14 +538,16 @@ ObjectMeta:
       type: string
     generation:
       type: integer
-    initializers:
-      $ref: '#/definitions/Initializers'
-      $schema: http://json-schema.org/draft-04/schema#
     labels:
       patternProperties:
         .*:
           type: string
       type: object
+    managedFields:
+      items:
+        $ref: '#/definitions/ManagedFieldsEntry'
+        $schema: http://json-schema.org/draft-04/schema#
+      type: array
     name:
       type: string
     namespace:
@@ -604,57 +594,6 @@ ScalingConfig:
       type: integer
     minSize:
       type: integer
-  type: object
-Status:
-  additionalProperties: false
-  properties:
-    TypeMeta:
-      $ref: '#/definitions/TypeMeta'
-    code:
-      type: integer
-    details:
-      $ref: '#/definitions/StatusDetails'
-      $schema: http://json-schema.org/draft-04/schema#
-    message:
-      type: string
-    metadata:
-      $ref: '#/definitions/ListMeta'
-      $schema: http://json-schema.org/draft-04/schema#
-    reason:
-      type: string
-    status:
-      type: string
-  required:
-  - TypeMeta
-  type: object
-StatusCause:
-  additionalProperties: false
-  properties:
-    field:
-      type: string
-    message:
-      type: string
-    reason:
-      type: string
-  type: object
-StatusDetails:
-  additionalProperties: false
-  properties:
-    causes:
-      items:
-        $ref: '#/definitions/StatusCause'
-        $schema: http://json-schema.org/draft-04/schema#
-      type: array
-    group:
-      type: string
-    kind:
-      type: string
-    name:
-      type: string
-    retryAfterSeconds:
-      type: integer
-    uid:
-      type: string
   type: object
 Time:
   additionalProperties: false
