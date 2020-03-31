@@ -20,7 +20,7 @@ require (
 	github.com/fluxcd/helm-operator/pkg/install v0.0.0-20200213151218-f7e487142b46 // helm-operator 1.0.0-rc9
 	github.com/gobuffalo/envy v1.9.0 // indirect
 	github.com/gobwas/glob v0.2.3
-	github.com/gohugoio/hugo v0.68.0
+	github.com/gohugoio/hugo v0.68.3
 	github.com/golangci/golangci-lint v1.21.0
 	github.com/goreleaser/goreleaser v0.110.0
 	github.com/instrumenta/kubeval v0.0.0-20190918223246-8d013ec9fc56
