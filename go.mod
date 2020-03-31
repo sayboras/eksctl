@@ -55,7 +55,7 @@ require (
 	k8s.io/cli-runtime v0.15.10
 	k8s.io/client-go v11.0.0+incompatible
 	k8s.io/cloud-provider v0.15.10
-	k8s.io/code-generator v0.15.10
+	k8s.io/code-generator v0.18.0
 	k8s.io/kops v1.15.2
 	k8s.io/kubelet v0.0.0
 	k8s.io/legacy-cloud-providers v0.0.0
