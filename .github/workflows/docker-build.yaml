@@ -2,17 +2,17 @@ name: docker
 
 on:
   pull_request:
-    paths:
-      - '.requirements'
-      - 'install-build-deps.sh'
-      - 'Dockerfile'
+  #    paths:
+  #      - '.requirements'
+  #      - 'install-build-deps.sh'
+  #      - 'Dockerfile'
   push:
     branches:
       - master
-    paths:
-      - '.requirements'
-      - 'install-build-deps.sh'
-      - 'Dockerfile'
+#    paths:
+#      - '.requirements'
+#      - 'install-build-deps.sh'
+#      - 'Dockerfile'
 
 jobs:
   eskctl-build:
