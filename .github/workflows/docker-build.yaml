@@ -1,0 +1,30 @@
+name: docs
+
+on:
+  pull_request:
+#    paths:
+#      - '.docker/image_tag'
+#      - 'Dockerfile'
+  push:
+    branches:
+      - master
+#    paths:
+#      - '.docker/image_tag'
+#      - 'Dockerfile'
+
+jobs:
+  publish-build-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get docker hash version
+        id: get_version
+        run: echo ::set-env name=IMAGE_HASH::$(cat .docker/image_tag)
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: sayboras/eskctl-build
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          dockerfile: Dockerfile
+          tags: "${{ env.IMAGE_HASH }}"
