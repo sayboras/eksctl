@@ -2,23 +2,24 @@ name: docker
 
 on:
   pull_request:
-#    paths:
-#      - '.docker/image_tag'
-#      - 'Dockerfile'
+    paths:
+      - '.requirements'
+      - 'install-build-deps.sh'
+      - 'Dockerfile'
   push:
     branches:
       - master
-#    paths:
-#      - '.docker/image_tag'
-#      - 'Dockerfile'
+    paths:
+      - '.requirements'
+      - 'install-build-deps.sh'
+      - 'Dockerfile'
 
 jobs:
-  publish-build-image:
+  eskctl-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Get docker hash version
-        id: get_version
         run: echo ::set-env name=IMAGE_HASH::$(cat .docker/image_tag)
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@master
