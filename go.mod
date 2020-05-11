@@ -20,7 +20,7 @@ require (
 	github.com/fluxcd/helm-operator/pkg/install v0.0.0-20200407140510-8d71b0072a3e // helm-operator 1.0.0
 	github.com/gobwas/glob v0.2.3
 	github.com/golangci/golangci-lint v1.21.0
-	github.com/goreleaser/goreleaser v0.110.0
+	github.com/goreleaser/goreleaser v0.134.0
 	github.com/instrumenta/kubeval v0.0.0-20190918223246-8d013ec9fc56
 	github.com/justinbarrick/go-k8s-portforward v1.0.3
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
