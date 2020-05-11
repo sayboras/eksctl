@@ -49,7 +49,7 @@ require (
 	golang.org/x/sys v0.0.0-20200428200454-593003d681fa // indirect
 	golang.org/x/tools v0.0.0-20200301222351-066e0c02454c
 	k8s.io/api v0.15.11
-	k8s.io/apiextensions-apiserver v0.15.11
+	k8s.io/apiextensions-apiserver v0.18.2
 	k8s.io/apimachinery v0.15.11
 	k8s.io/cli-runtime v0.15.11
 	k8s.io/client-go v11.0.0+incompatible
