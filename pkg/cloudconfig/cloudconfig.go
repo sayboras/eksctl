@@ -8,7 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/kris-nova/logger"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	"sigs.k8s.io/yaml"
 )

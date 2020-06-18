@@ -16,7 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/elb/elbiface"
 	"github.com/aws/aws-sdk-go/service/elbv2"
 	"github.com/aws/aws-sdk-go/service/elbv2/elbv2iface"
-	"github.com/kris-nova/logger"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	corev1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -86,7 +86,7 @@ func Cleanup(ctx context.Context, ec2API ec2iface.EC2API, elbAPI elbiface.ELBAPI
 		for name, lb := range loadBalancers {
 			exists, err := loadBalancerExists(ctx, ec2API, elbAPI, elbv2API, lb)
 			if err != nil {
-				logger.Warning("error when checking existence of load balancer %s: %s", lb.name, err)
+				logger.Warnf("error when checking existence of load balancer %s: %s", lb.name, err)
 			}
 			if exists {
 				continue
@@ -381,7 +381,7 @@ func describeClassicLoadBalancer(ctx context.Context, elbAPI elbiface.ELBAPI,
 	var ret *elb.LoadBalancerDescription
 	switch {
 	case len(response.LoadBalancerDescriptions) > 1:
-		logger.Warning("found multiple load balancers with name: %s", name)
+		logger.Warnf("found multiple load balancers with name: %s", name)
 		fallthrough
 	case len(response.LoadBalancerDescriptions) > 0:
 		ret = response.LoadBalancerDescriptions[0]

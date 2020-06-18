@@ -7,8 +7,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
 	awseks "github.com/aws/aws-sdk-go/service/eks"
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
@@ -92,7 +92,7 @@ func (c *ClusterProvider) UpdateClusterConfigForLogging(cfg *api.ClusterConfig) 
 		describeDisabledTypes = fmt.Sprintf("disabled types: %s", strings.Join(disabled.List(), ", "))
 	}
 
-	logger.Success("configured CloudWatch logging for cluster %q in %q (%s & %s)",
+	logger.Infof("configured CloudWatch logging for cluster %q in %q (%s & %s)",
 		cfg.Metadata.Name, cfg.Metadata.Region, describeEnabledTypes, describeDisabledTypes,
 	)
 	return nil
@@ -183,7 +183,7 @@ func (c *ClusterProvider) UpdateClusterTags(cfg *api.ClusterConfig) error {
 	for k, v := range cfg.Metadata.Tags {
 		tagStrings = append(tagStrings, fmt.Sprintf("%s=%s", k, v))
 	}
-	logger.Success("tagged EKS cluster (%s)", strings.Join(tagStrings, ", "))
+	logger.Infof("tagged EKS cluster (%s)", strings.Join(tagStrings, ", "))
 	return nil
 }
 

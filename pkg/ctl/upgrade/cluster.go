@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/ctl/cmdutils"
@@ -75,7 +75,7 @@ func DoUpgradeCluster(cmd *cmdutils.Cmd) error {
 	}
 
 	if cmd.ClusterConfigFile != "" {
-		logger.Warning("NOTE: cluster VPC (subnets, routing & NAT Gateway) configuration changes are not yet implemented")
+		logger.Warnf("NOTE: cluster VPC (subnets, routing & NAT Gateway) configuration changes are not yet implemented")
 	}
 	currentVersion := ctl.ControlPlaneVersion()
 	versionUpdateRequired, err := requiresVersionUpgrade(cfg.Metadata, currentVersion)
@@ -87,7 +87,7 @@ func DoUpgradeCluster(cmd *cmdutils.Cmd) error {
 		return errors.Wrapf(err, "getting VPC configuration for cluster %q", cfg.Metadata.Name)
 	}
 
-	if err := printer.LogObj(logger.Debug, "cfg.json = \\\n%s\n", cfg); err != nil {
+	if err := printer.LogObj("cfg.json = \\\n%s\n", cfg); err != nil {
 		return err
 	}
 
@@ -100,7 +100,7 @@ func DoUpgradeCluster(cmd *cmdutils.Cmd) error {
 			if err := ctl.UpdateClusterVersionBlocking(cfg); err != nil {
 				return err
 			}
-			logger.Success("cluster %q control plane has been upgraded to version %q", cfg.Metadata.Name, cfg.Metadata.Version)
+			logger.Infof("cluster %q control plane has been upgraded to version %q", cfg.Metadata.Name, cfg.Metadata.Version)
 			logger.Info(msgNodeGroupsAndAddons)
 		}
 	}
@@ -120,7 +120,7 @@ func DoUpgradeCluster(cmd *cmdutils.Cmd) error {
 	}
 
 	if err := ctl.ValidateExistingNodeGroupsForCompatibility(cfg, stackManager); err != nil {
-		logger.Critical("failed checking nodegroups", err.Error())
+		logger.Fatalf("failed checking nodegroups", err.Error())
 	}
 
 	cmdutils.LogPlanModeWarning(cmd.Plan && (stackUpdateRequired || versionUpdateRequired))

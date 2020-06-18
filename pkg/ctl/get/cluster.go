@@ -3,11 +3,11 @@ package get
 import (
 	"fmt"
 
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/ctl/cmdutils"
+	"github.com/weaveworks/eksctl/pkg/logger"
 )
 
 func getClusterCmd(cmd *cmdutils.Cmd) {
@@ -46,7 +46,7 @@ func doGetCluster(cmd *cmdutils.Cmd, params *getCmdParams, listAllRegions bool) 
 	}
 
 	if regionGiven && listAllRegions {
-		logger.Warning("--region=%s is ignored, as --all-regions is given", cfg.Metadata.Region)
+		logger.Warnf("--region=%s is ignored, as --all-regions is given", cfg.Metadata.Region)
 	}
 
 	if cfg.Metadata.Name != "" && cmd.NameArg != "" {

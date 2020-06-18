@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/ctl/cmdutils"
@@ -101,7 +101,7 @@ func doCreateIAMServiceAccount(cmd *cmdutils.Cmd, overrideExistingServiceAccount
 	}
 
 	if !providerExists {
-		logger.Warning("no IAM OIDC provider associated with cluster, try 'eksctl utils associate-iam-oidc-provider --region=%s --cluster=%s'", meta.Region, meta.Name)
+		logger.Warnf("no IAM OIDC provider associated with cluster, try 'eksctl utils associate-iam-oidc-provider --region=%s --cluster=%s'", meta.Region, meta.Name)
 		return errors.New("unable to create iamserviceaccount(s) without IAM OIDC provider enabled")
 	}
 
@@ -114,23 +114,23 @@ func doCreateIAMServiceAccount(cmd *cmdutils.Cmd, overrideExistingServiceAccount
 	filteredServiceAccounts := saFilter.FilterMatching(cfg.IAM.ServiceAccounts)
 	saFilter.LogInfo(cfg.IAM.ServiceAccounts)
 	if !overrideExistingServiceAccounts {
-		logger.Warning("serviceaccounts that exists in Kubernetes will be excluded, use --override-existing-serviceaccounts to override")
+		logger.Warnf("serviceaccounts that exists in Kubernetes will be excluded, use --override-existing-serviceaccounts to override")
 	} else {
-		logger.Warning("metadata of serviceaccounts that exist in Kubernetes will be updated, as --override-existing-serviceaccounts was set")
+		logger.Warnf("metadata of serviceaccounts that exist in Kubernetes will be updated, as --override-existing-serviceaccounts was set")
 	}
 
 	tasks := stackManager.NewTasksToCreateIAMServiceAccounts(filteredServiceAccounts, oidc, kubernetes.NewCachedClientSet(clientSet))
 	tasks.PlanMode = cmd.Plan
 
-	if err := printer.LogObj(logger.Debug, "cfg.json = \\\n%s\n", cfg); err != nil {
+	if err := printer.LogObj("cfg.json = \\\n%s\n", cfg); err != nil {
 		return err
 	}
 
 	logger.Info(tasks.Describe())
 	if errs := tasks.DoAllSync(); len(errs) > 0 {
-		logger.Info("%d error(s) occurred and IAM Role stacks haven't been created properly, you may wish to check CloudFormation console", len(errs))
+		logger.Infof("%d error(s) occurred and IAM Role stacks haven't been created properly, you may wish to check CloudFormation console", len(errs))
 		for _, err := range errs {
-			logger.Critical("%s\n", err.Error())
+			logger.Fatalf("%s\n", err.Error())
 		}
 		return fmt.Errorf("failed to create iamserviceaccount(s)")
 	}

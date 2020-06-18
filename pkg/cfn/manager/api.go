@@ -9,8 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/cloudformation"
 	"github.com/aws/aws-sdk-go/service/cloudtrail"
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/cfn/builder"
@@ -146,7 +146,7 @@ func (c *StackCollection) CreateStack(name string, stack builder.ResourceSet, ta
 		return err
 	}
 
-	logger.Info("deploying stack %q", name)
+	logger.Infof("deploying stack %q", name)
 
 	go c.waitUntilStackIsCreated(i, stack, errs)
 
@@ -172,7 +172,7 @@ func (c *StackCollection) UpdateStack(stackName, changeSetName, description stri
 	}
 	logger.Debug("changes = %#v", changeSet.Changes)
 	if err := c.doExecuteChangeSet(stackName, changeSetName); err != nil {
-		logger.Warning("error executing Cloudformation changeSet %s in stack %s. Check the Cloudformation console for further details", changeSetName, stackName)
+		logger.Warnf("error executing Cloudformation changeSet %s in stack %s. Check the Cloudformation console for further details", changeSetName, stackName)
 		return err
 	}
 	return c.doWaitUntilStackIsUpdated(i)
@@ -342,11 +342,11 @@ func (c *StackCollection) DeleteStackByName(name string) (*Stack, error) {
 		err = errors.Wrapf(err, "not able to get stack %q for deletion", name)
 		stacks, newErr := c.ListStacksMatching(fmt.Sprintf("^%s$", name), cloudformation.StackStatusDeleteComplete)
 		if newErr != nil {
-			logger.Critical("not able double-check if stack was already deleted: %s", newErr.Error())
+			logger.Fatalf("not able double-check if stack was already deleted: %s", newErr.Error())
 		}
 		if count := len(stacks); count > 0 {
 			logger.Debug("%d deleted stacks found {%v}", count, stacks)
-			logger.Info("stack %q was already deleted", name)
+			logger.Infof("stack %q was already deleted", name)
 			return nil, nil
 		}
 		return nil, err
@@ -363,7 +363,7 @@ func (c *StackCollection) DeleteStackByNameSync(name string, errs chan error) er
 		return err
 	}
 
-	logger.Info("waiting for stack %q to get deleted", *i.StackName)
+	logger.Infof("waiting for stack %q to get deleted", *i.StackName)
 
 	go c.waitUntilStackIsDeleted(i, errs)
 
@@ -385,7 +385,7 @@ func (c *StackCollection) DeleteStackBySpec(s *Stack) (*Stack, error) {
 			if _, err := c.provider.CloudFormation().DeleteStack(input); err != nil {
 				return nil, errors.Wrapf(err, "not able to delete stack %q", *s.StackName)
 			}
-			logger.Info("will delete stack %q", *s.StackName)
+			logger.Infof("will delete stack %q", *s.StackName)
 			return s, nil
 		}
 	}
@@ -415,7 +415,7 @@ func (c *StackCollection) DeleteStackBySpecSync(s *Stack, errs chan error) error
 		return err
 	}
 
-	logger.Info("waiting for stack %q to get deleted", *i.StackName)
+	logger.Infof("waiting for stack %q to get deleted", *i.StackName)
 
 	go c.waitUntilStackIsDeleted(i, errs)
 

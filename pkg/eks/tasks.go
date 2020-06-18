@@ -1,8 +1,8 @@
 package eks
 
 import (
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	"github.com/weaveworks/eksctl/pkg/addons"
 	iamoidc "github.com/weaveworks/eksctl/pkg/iam/oidc"
@@ -83,8 +83,8 @@ func (c *ClusterProvider) CreateExtraClusterConfigTasks(cfg *api.ClusterConfig, 
 		})
 	}
 	if !cfg.HasClusterCloudWatchLogging() {
-		logger.Info("CloudWatch logging will not be enabled for cluster %q in %q", cfg.Metadata.Name, cfg.Metadata.Region)
-		logger.Info("you can enable it with 'eksctl utils update-cluster-logging --region=%s --cluster=%s'", cfg.Metadata.Region, cfg.Metadata.Name)
+		logger.Infof("CloudWatch logging will not be enabled for cluster %q in %q", cfg.Metadata.Name, cfg.Metadata.Region)
+		logger.Infof("you can enable it with 'eksctl utils update-cluster-logging --region=%s --cluster=%s'", cfg.Metadata.Region, cfg.Metadata.Name)
 
 	} else {
 		newTasks.Append(&clusterConfigTask{

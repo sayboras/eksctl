@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kris-nova/logger"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	"github.com/aws/aws-sdk-go/aws/client"
 	"github.com/aws/aws-sdk-go/aws/request"
@@ -63,7 +63,7 @@ func (l LoggingRetryer) RetryRules(r *request.Request) time.Duration {
 		errorDescription = fmt.Sprintf("%d %s", r.HTTPResponse.StatusCode, r.HTTPResponse.Status)
 	}
 
-	logger.Warning("retryable error (%s) from %s - will retry after delay of %v", errorDescription, methodDescription, duration)
+	logger.Warnf("retryable error (%s) from %s - will retry after delay of %v", errorDescription, methodDescription, duration)
 
 	return duration
 }

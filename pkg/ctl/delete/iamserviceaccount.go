@@ -3,9 +3,9 @@ package delete
 import (
 	"fmt"
 
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/ctl/cmdutils"
@@ -105,7 +105,7 @@ func doDeleteIAMServiceAccount(cmd *cmdutils.Cmd, serviceAccount *api.ClusterIAM
 	stackManager := ctl.NewStackManager(cfg)
 
 	if cmd.ClusterConfigFile != "" {
-		logger.Info("comparing %d iamserviceaccounts defined in the given config (%q) against remote state", len(cfg.IAM.ServiceAccounts), cmd.ClusterConfigFile)
+		logger.Infof("comparing %d iamserviceaccounts defined in the given config (%q) against remote state", len(cfg.IAM.ServiceAccounts), cmd.ClusterConfigFile)
 		if err := saFilter.SetIncludeOrExcludeMissingFilter(stackManager, onlyMissing, &cfg.IAM.ServiceAccounts); err != nil {
 			return err
 		}
@@ -121,15 +121,15 @@ func doDeleteIAMServiceAccount(cmd *cmdutils.Cmd, serviceAccount *api.ClusterIAM
 	}
 	tasks.PlanMode = cmd.Plan
 
-	if err := printer.LogObj(logger.Debug, "cfg.json = \\\n%s\n", cfg); err != nil {
+	if err := printer.LogObj("cfg.json = \\\n%s\n", cfg); err != nil {
 		return err
 	}
 
-	logger.Info(tasks.Describe())
+	logger.Infof(tasks.Describe())
 	if errs := tasks.DoAllSync(); len(errs) > 0 {
-		logger.Info("%d error(s) occurred and IAM Role stacks haven't been deleted properly, you may wish to check CloudFormation console", len(errs))
+		logger.Infof("%d error(s) occurred and IAM Role stacks haven't been deleted properly, you may wish to check CloudFormation console", len(errs))
 		for _, err := range errs {
-			logger.Critical("%s\n", err.Error())
+			logger.Fatalf("%s\n", err.Error())
 		}
 		return fmt.Errorf("failed to delete iamserviceaccount(s)")
 	}

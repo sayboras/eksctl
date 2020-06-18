@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/weaveworks/eksctl/pkg/addons"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
@@ -30,7 +30,7 @@ func UpdateCoreDNS(rawClient kubernetes.RawClientInterface, region, controlPlane
 	kubeDNSSevice, err := rawClient.ClientSet().CoreV1().Services(metav1.NamespaceSystem).Get(KubeDNS, metav1.GetOptions{})
 	if err != nil {
 		if apierrs.IsNotFound(err) {
-			logger.Warning("%q service was not found", KubeDNS)
+			logger.Warnf("%q service was not found", KubeDNS)
 			return false, nil
 		}
 		return false, errors.Wrapf(err, "getting %q service", KubeDNS)
@@ -39,7 +39,7 @@ func UpdateCoreDNS(rawClient kubernetes.RawClientInterface, region, controlPlane
 	kubeDNSDeployment, err := rawClient.ClientSet().AppsV1().Deployments(metav1.NamespaceSystem).Get(CoreDNS, metav1.GetOptions{})
 	if err != nil {
 		if apierrs.IsNotFound(err) {
-			logger.Warning("%q was not found", CoreDNS)
+			logger.Warnf("%q was not found", CoreDNS)
 			return false, nil
 		}
 		return false, errors.Wrapf(err, "getting %q", CoreDNS)
@@ -93,14 +93,14 @@ func UpdateCoreDNS(rawClient kubernetes.RawClientInterface, region, controlPlane
 
 	if plan {
 		if tagMismatch {
-			logger.Critical("(plan) %q is not up-to-date", CoreDNS)
+			logger.Fatalf("(plan) %q is not up-to-date", CoreDNS)
 			return true, nil
 		}
-		logger.Info("(plan) %q is already up-to-date", CoreDNS)
+		logger.Infof("(plan) %q is already up-to-date", CoreDNS)
 		return false, nil
 	}
 
-	logger.Info("%q is now up-to-date", CoreDNS)
+	logger.Infof("%q is now up-to-date", CoreDNS)
 	return false, nil
 }
 

@@ -9,8 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
 	"github.com/weaveworks/eksctl/pkg/utils/file"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
@@ -39,7 +39,7 @@ func LoadKeyFromFile(filePath, clusterName, ngName string, ec2API ec2iface.EC2AP
 	}
 	keyName := getKeyName(clusterName, ngName, fingerprint)
 
-	logger.Info("using SSH public key %q as %q ", expandedPath, keyName)
+	logger.Infof("using SSH public key %q as %q ", expandedPath, keyName)
 
 	// Import SSH key in EC2
 	if err := importKey(keyName, fingerprint, &key, ec2API); err != nil {
@@ -56,7 +56,7 @@ func LoadKeyByContent(key *string, clusterName, ngName string, ec2API ec2iface.E
 	}
 	keyName := getKeyName(clusterName, ngName, fingerprint)
 
-	logger.Info("using SSH public key %q ", *key)
+	logger.Infof("using SSH public key %q ", *key)
 
 	// Import SSH key in EC2
 	if err := importKey(keyName, fingerprint, key, ec2API); err != nil {

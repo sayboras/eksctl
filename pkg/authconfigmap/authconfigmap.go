@@ -10,8 +10,8 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws/awsutil"
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -96,7 +96,7 @@ func (a *AuthConfigMap) AddAccount(account string) error {
 	// Distinct and sorted account numbers
 	accounts = append(accounts, account)
 	accounts = sets.NewString(accounts...).List()
-	logger.Info("adding account %q to auth ConfigMap", account)
+	logger.Infof("adding account %q to auth ConfigMap", account)
 	return a.setAccounts(accounts)
 }
 
@@ -119,7 +119,7 @@ func (a *AuthConfigMap) RemoveAccount(account string) error {
 	if !found {
 		return fmt.Errorf("account %q not found in auth ConfigMap", account)
 	}
-	logger.Info("removing account %q from auth ConfigMap", account)
+	logger.Infof("removing account %q from auth ConfigMap", account)
 	return a.setAccounts(newAccounts)
 }
 
@@ -151,7 +151,7 @@ func (a *AuthConfigMap) AddIdentity(identity iam.Identity) error {
 
 	identities = append(identities, identity)
 
-	logger.Info("adding identity %q to auth ConfigMap", identity.ARN())
+	logger.Infof("adding identity %q to auth ConfigMap", identity.ARN())
 	return a.setIdentities(identities)
 }
 
@@ -170,7 +170,7 @@ func (a *AuthConfigMap) RemoveIdentity(arnToDelete string, all bool) error {
 	for i, identity := range identities {
 		arn := identity.ARN()
 		if arn == arnToDelete {
-			logger.Info("removing identity %q from auth ConfigMap (username = %q, groups = %q)", arnToDelete, identity.Username(), identity.Groups())
+			logger.Infof("removing identity %q from auth ConfigMap (username = %q, groups = %q)", arnToDelete, identity.Username(), identity.Groups())
 			if !all {
 				identities = append(identities[:i], identities[i+1:]...)
 				return a.setIdentities(identities)

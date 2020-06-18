@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/cfn/manager"
@@ -88,9 +88,9 @@ func isNodeGroupCompatible(name string, info manager.StackInfo) (bool, error) {
 		// however users are unaware of that API v1alpha3 was broken this way, so we need this warning;
 		// as `outputs.NodeGroupFeatureLocalSecurityGroup` was added in 0.1.20/v1alpha4, it can be used to
 		// infer use of v1alpha3 and thereby warn the user that their cluster may had been misconfigured
-		logger.Warning("looks like nodegroup %q was created using v1alpha3 API and is not using shared SG", name)
-		logger.Warning("if you didn't disable shared SG and expect that pods running on %q should have access to all other pods", name)
-		logger.Warning("then you should replace nodegroup %q or patch the configuration", name)
+		logger.Warnf("looks like nodegroup %q was created using v1alpha3 API and is not using shared SG", name)
+		logger.Warnf("if you didn't disable shared SG and expect that pods running on %q should have access to all other pods", name)
+		logger.Warnf("then you should replace nodegroup %q or patch the configuration", name)
 	}
 
 	return true, nil
@@ -130,11 +130,11 @@ func (c *ClusterProvider) ValidateExistingNodeGroupsForCompatibility(cfg *api.Cl
 		return nil
 	}
 
-	logger.Critical("found %d nodegroup(s) (%s) without shared security group, cluster networking maybe be broken",
+	logger.Fatalf("found %d nodegroup(s) (%s) without shared security group, cluster networking maybe be broken",
 		numIncompatibleNodeGroups, strings.Join(incompatibleNodeGroups, ", "))
-	logger.Critical("it's recommended to create new nodegroups, then delete old ones")
+	logger.Fatalf("it's recommended to create new nodegroups, then delete old ones")
 	if cfg.VPC.SharedNodeSecurityGroup != "" {
-		logger.Critical("as a temporary fix, you can patch the configuration and add each of these nodegroup(s) to %q",
+		logger.Fatalf("as a temporary fix, you can patch the configuration and add each of these nodegroup(s) to %q",
 			cfg.VPC.SharedNodeSecurityGroup)
 	}
 

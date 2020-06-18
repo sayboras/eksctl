@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	"github.com/weaveworks/eksctl/pkg/utils/retry"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -72,7 +72,7 @@ func isDeploymentScheduledOnFargate(clientSet kubeclient.Interface) (bool, error
 		computeType == computeTypeFargate &&
 		*coredns.Spec.Replicas == coredns.Status.ReadyReplicas
 	if scheduled {
-		logger.Info("%q is now scheduled onto Fargate", Name)
+		logger.Infof("%q is now scheduled onto Fargate", Name)
 	}
 	return scheduled, nil
 }
@@ -89,7 +89,7 @@ func arePodsScheduledOnFargate(clientSet kubeclient.Interface) (bool, error) {
 			return false, nil
 		}
 	}
-	logger.Info("%q pods are now scheduled onto Fargate", Name)
+	logger.Infof("%q pods are now scheduled onto Fargate", Name)
 	return true, nil
 }
 
@@ -108,7 +108,7 @@ func ScheduleOnFargate(clientSet kubeclient.Interface) error {
 	if err := scheduleOnFargate(clientSet); err != nil {
 		return errors.Wrapf(err, "failed to make %q deployment schedulable on Fargate", Name)
 	}
-	logger.Info("%q is now schedulable onto Fargate", Name)
+	logger.Infof("%q is now schedulable onto Fargate", Name)
 	return nil
 }
 

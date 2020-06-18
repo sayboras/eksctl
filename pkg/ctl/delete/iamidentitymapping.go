@@ -1,9 +1,9 @@
 package delete
 
 import (
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/authconfigmap"
@@ -95,7 +95,7 @@ func doDeleteIAMIdentityMapping(cmd *cmdutils.Cmd, arn string, all bool) error {
 	}
 
 	if duplicates > 0 {
-		logger.Warning("there are %d mappings left with same arn %q (use --all to delete them at once)", duplicates, arn)
+		logger.Warnf("there are %d mappings left with same arn %q (use --all to delete them at once)", duplicates, arn)
 	}
 	return nil
 }

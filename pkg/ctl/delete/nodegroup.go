@@ -1,9 +1,9 @@
 package delete
 
 import (
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/authconfigmap"
@@ -110,8 +110,11 @@ func doDeleteNodeGroup(cmd *cmdutils.Cmd, ng *api.NodeGroup, updateAuthConfigMap
 		for _, ng := range cfg.NodeGroups {
 			if ng.IAM == nil || ng.IAM.InstanceRoleARN == "" {
 				if err := ctl.GetNodeGroupIAM(stackManager, cfg, ng); err != nil {
-					logger.Warning("error getting instance role ARN for nodegroup %q: %v", ng.Name, err)
+					logger.Warnf("error getting instance role ARN for nodegroup %q: %v", ng.Name, err)
 					return nil
+				}
+				if err := authconfigmap.RemoveNodeGroup(clientSet, ng); err != nil {
+					logger.Warnf(err.Error())
 				}
 			}
 		}
@@ -159,7 +162,7 @@ func doDeleteNodeGroup(cmd *cmdutils.Cmd, ng *api.NodeGroup, updateAuthConfigMap
 		if !cmd.Plan {
 			for _, ng := range cfg.NodeGroups {
 				if err := authconfigmap.RemoveNodeGroup(clientSet, ng); err != nil {
-					logger.Warning(err.Error())
+					logger.Warn(err.Error())
 				}
 			}
 		}

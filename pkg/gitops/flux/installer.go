@@ -13,8 +13,8 @@ import (
 
 	fluxinstall "github.com/fluxcd/flux/pkg/install"
 	helmopinstall "github.com/fluxcd/helm-operator/pkg/install"
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kubeclient "k8s.io/client-go/kubernetes"
@@ -73,7 +73,7 @@ func (fi *Installer) Run(ctx context.Context) (string, error) {
 		return "", err
 	}
 
-	logger.Info("Cloning %s", fi.opts.Repo.URL)
+	logger.Infof("Cloning %s", fi.opts.Repo.URL)
 	options := git.CloneOptions{
 		URL:       fi.opts.Repo.URL,
 		Branch:    fi.opts.Repo.Branch,
@@ -88,7 +88,7 @@ func (fi *Installer) Run(ctx context.Context) (string, error) {
 		if cleanCloneDir {
 			_ = fi.gitClient.DeleteLocalRepo()
 		} else {
-			logger.Critical("You may find the local clone of %s used by eksctl at %s",
+			logger.Fatalf("You may find the local clone of %s used by eksctl at %s",
 				fi.opts.Repo.URL,
 				cloneDir)
 		}
@@ -103,7 +103,7 @@ func (fi *Installer) Run(ctx context.Context) (string, error) {
 		return "", err
 	}
 
-	logger.Info("Applying manifests")
+	logger.Infof("Applying manifests")
 	if err := fi.applyManifests(manifests); err != nil {
 		return "", err
 	}
@@ -132,7 +132,7 @@ func (fi *Installer) Run(ctx context.Context) (string, error) {
 	logger.Info("see https://docs.fluxcd.io/projects/flux for details on how to use Flux")
 
 	if api.IsEnabled(fi.opts.Operator.CommitOperatorManifests) {
-		logger.Info("Committing and pushing manifests to %s", fi.opts.Repo.URL)
+		logger.Infof("Committing and pushing manifests to %s", fi.opts.Repo.URL)
 		if err = fi.addFilesToRepo(); err != nil {
 			return "", err
 		}
@@ -157,7 +157,7 @@ func (fi *Installer) IsFluxInstalled() (bool, error) {
 	_, err := fi.k8sClientSet.AppsV1().Deployments(fi.opts.Operator.Namespace).Get("flux", metav1.GetOptions{})
 	if err != nil {
 		if apierrs.IsNotFound(err) {
-			logger.Warning("flux deployment was not found")
+			logger.Warn("flux deployment was not found")
 			return false, nil
 		}
 		return false, errors.Wrapf(err, "error while looking for flux pod")

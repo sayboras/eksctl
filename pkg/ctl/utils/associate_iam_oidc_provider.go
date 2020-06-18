@@ -1,9 +1,9 @@
 package utils
 
 import (
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/ctl/cmdutils"
@@ -60,7 +60,7 @@ func doAssociateIAMOIDCProvider(cmd *cmdutils.Cmd) error {
 		return err
 	}
 
-	if err := printer.LogObj(logger.Debug, "cfg.json = \\\n%s\n", cfg); err != nil {
+	if err := printer.LogObj("cfg.json = \\\n%s\n", cfg); err != nil {
 		return err
 	}
 
@@ -75,10 +75,10 @@ func doAssociateIAMOIDCProvider(cmd *cmdutils.Cmd) error {
 			if err := oidc.CreateProvider(); err != nil {
 				return err
 			}
-			logger.Success("created IAM Open ID Connect provider for cluster %q in %q", meta.Name, meta.Region)
+			logger.Infof("created IAM Open ID Connect provider for cluster %q in %q", meta.Name, meta.Region)
 		}
 	} else {
-		logger.Info("IAM Open ID Connect provider is already associated with cluster %q in %q", meta.Name, meta.Region)
+		logger.Infof("IAM Open ID Connect provider is already associated with cluster %q in %q", meta.Name, meta.Region)
 	}
 
 	cmdutils.LogPlanModeWarning(cmd.Plan && !providerExists)

@@ -3,10 +3,10 @@ package utils
 import (
 	"fmt"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/ctl/cmdutils"
@@ -86,7 +86,7 @@ func doWriteKubeconfigCmd(cmd *cmdutils.Cmd, outputPath, roleARN string, setCont
 		return errors.Wrap(err, "writing kubeconfig")
 	}
 
-	logger.Success("saved kubeconfig as %q", filename)
+	logger.Infof("saved kubeconfig as %q", filename)
 
 	return nil
 }

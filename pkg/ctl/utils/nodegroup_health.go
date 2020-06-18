@@ -1,10 +1,10 @@
 package utils
 
 import (
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/weaveworks/eksctl/pkg/cfn/manager"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	"github.com/weaveworks/eksctl/pkg/managed"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
@@ -74,12 +74,12 @@ func getNodeGroupHealth(cmd *cmdutils.Cmd, nodeGroupName string) error {
 	}
 
 	if len(healthIssues) == 0 {
-		logger.Info("No health issues found. Node group %q is active", nodeGroupName)
+		logger.Infof("No health issues found. Node group %q is active", nodeGroupName)
 		return nil
 	}
 
 	for _, issue := range healthIssues {
-		logger.Warning(issue.Message)
+		logger.Warn(issue.Message)
 	}
 
 	return nil

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/weaveworks/eksctl/pkg/eks"
 	"github.com/weaveworks/eksctl/pkg/fargate"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/cfn/manager"
@@ -51,9 +51,9 @@ func deleteClusterCmd(cmd *cmdutils.Cmd) {
 }
 
 func handleErrors(errs []error, subject string) error {
-	logger.Info("%d error(s) occurred while deleting %s", len(errs), subject)
+	logger.Infof("%d error(s) occurred while deleting %s", len(errs), subject)
 	for _, err := range errs {
-		logger.Critical("%s\n", err.Error())
+		logger.Fatalf("%s\n", err.Error())
 	}
 	return fmt.Errorf("failed to delete %s", subject)
 }
@@ -64,11 +64,11 @@ func deleteDeprecatedStacks(stackManager *manager.StackCollection) (bool, error)
 		return true, err
 	}
 	if count := tasks.Len(); count > 0 {
-		logger.Info(tasks.Describe())
+		logger.Infof(tasks.Describe())
 		if errs := tasks.DoAllSync(); len(errs) > 0 {
 			return true, handleErrors(errs, "deprecated stacks")
 		}
-		logger.Success("deleted all %s deperecated stacks", count)
+		logger.Infof("deleted all %s deperecated stacks", count)
 		return true, nil
 	}
 	return false, nil
@@ -94,8 +94,8 @@ func doDeleteCluster(cmd *cmdutils.Cmd) error {
 		return err
 	}
 
-	logger.Info("deleting EKS cluster %q", meta.Name)
-	if err := printer.LogObj(logger.Debug, "cfg.json = \\\n%s\n", cfg); err != nil {
+	logger.Infof("deleting EKS cluster %q", meta.Name)
+	if err := printer.LogObj("cfg.json = \\\n%s\n", cfg); err != nil {
 		return err
 	}
 
@@ -156,7 +156,7 @@ func doDeleteCluster(cmd *cmdutils.Cmd) error {
 
 		deleteOIDCProvider := clusterOperable && oidcSupported
 		tasks, err := stackManager.NewTasksToDeleteClusterWithNodeGroups(deleteOIDCProvider, oidc, kubernetes.NewCachedClientSet(clientSet), cmd.Wait, func(errs chan error, _ string) error {
-			logger.Info("trying to cleanup dangling network interfaces")
+			logger.Infof("trying to cleanup dangling network interfaces")
 			if err := ctl.LoadClusterVPC(cfg); err != nil {
 				return errors.Wrapf(err, "getting VPC configuration for cluster %q", cfg.Metadata.Name)
 			}
@@ -173,16 +173,16 @@ func doDeleteCluster(cmd *cmdutils.Cmd) error {
 		}
 
 		if tasks.Len() == 0 {
-			logger.Warning("no cluster resources were found for %q", meta.Name)
+			logger.Warnf("no cluster resources were found for %q", meta.Name)
 			return nil
 		}
 
-		logger.Info(tasks.Describe())
+		logger.Infof(tasks.Describe())
 		if errs := tasks.DoAllSync(); len(errs) > 0 {
 			return handleErrors(errs, "cluster with nodegroup(s)")
 		}
 
-		logger.Success("all cluster resources were deleted")
+		logger.Info("all cluster resources were deleted")
 	}
 
 	{
@@ -204,7 +204,7 @@ func deleteFargateProfiles(cmd *cmdutils.Cmd, ctl *eks.ClusterProvider) error {
 	if err != nil {
 		if fargate.IsUnauthorizedError(err) {
 			logger.Debug("Fargate: unauthorized error: %v", err)
-			logger.Info("either account is not authorized to use Fargate or region %s is not supported. Ignoring error",
+			logger.Infof("either account is not authorized to use Fargate or region %s is not supported. Ignoring error",
 				cmd.ClusterConfig.Metadata.Region)
 			return nil
 		}
@@ -218,15 +218,15 @@ func deleteFargateProfiles(cmd *cmdutils.Cmd, ctl *eks.ClusterProvider) error {
 	//   status DELETING
 
 	for _, profileName := range profileNames {
-		logger.Info("deleting Fargate profile %q", *profileName)
+		logger.Infof("deleting Fargate profile %q", *profileName)
 		// All Fargate profiles must be completely deleted by waiting for the deletion to complete, before deleting
 		// the cluster itself, otherwise it can result in this error:
 		//   Cannot delete because cluster <cluster> currently has Fargate profile <profile> in status DELETING
 		if err := awsClient.DeleteProfile(*profileName, true); err != nil {
 			return err
 		}
-		logger.Info("deleted Fargate profile %q", *profileName)
+		logger.Infof("deleted Fargate profile %q", *profileName)
 	}
-	logger.Info("deleted %v Fargate profile(s)", len(profileNames))
+	logger.Infof("deleted %v Fargate profile(s)", len(profileNames))
 	return nil
 }

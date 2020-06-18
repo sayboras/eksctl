@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -90,7 +90,7 @@ func doEnableLogging(cmd *cmdutils.Cmd, logTypesToEnable []string, logTypesToDis
 	willBeDisabled := sets.NewString(api.SupportedCloudWatchClusterLogTypes()...).Difference(willBeEnabled)
 	updateRequired := !currentlyEnabled.Equal(willBeEnabled)
 
-	if err = printer.LogObj(logger.Debug, "cfg.json = \\\n%s\n", cfg); err != nil {
+	if err = printer.LogObj("cfg.json = \\\n%s\n", cfg); err != nil {
 		return err
 	}
 
@@ -114,7 +114,7 @@ func doEnableLogging(cmd *cmdutils.Cmd, logTypesToEnable []string, logTypesToDis
 			}
 		}
 	} else {
-		logger.Success("CloudWatch logging for cluster %q in %q is already up-to-date", meta.Name, meta.Region)
+		logger.Infof("CloudWatch logging for cluster %q in %q is already up-to-date", meta.Name, meta.Region)
 	}
 
 	cmdutils.LogPlanModeWarning(cmd.Plan && updateRequired)

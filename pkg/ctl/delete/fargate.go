@@ -3,12 +3,12 @@ package delete
 import (
 	"fmt"
 
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/ctl/cmdutils"
 	"github.com/weaveworks/eksctl/pkg/fargate"
+	"github.com/weaveworks/eksctl/pkg/logger"
 )
 
 func deleteFargateProfileWithRunFunc(cmd *cmdutils.Cmd, runFunc func(cmd *cmdutils.Cmd, opts *fargate.Options) error) {
@@ -70,14 +70,14 @@ func doDeleteFargateProfile(cmd *cmdutils.Cmd, opts *fargate.Options) error {
 	clusterName := cmd.ClusterConfig.Metadata.Name
 	awsClient := fargate.NewClientWithWaitTimeout(clusterName, ctl.Provider.EKS(), cmd.ProviderConfig.WaitTimeout)
 	if cmd.Wait {
-		logger.Info(deletingFargateProfileMsg(clusterName, opts.ProfileName))
+		logger.Infof(deletingFargateProfileMsg(clusterName, opts.ProfileName))
 	} else {
 		logger.Debug(deletingFargateProfileMsg(clusterName, opts.ProfileName))
 	}
 	if err := awsClient.DeleteProfile(opts.ProfileName, cmd.Wait); err != nil {
 		return err
 	}
-	logger.Info("deleted Fargate profile %q on EKS cluster %q", opts.ProfileName, clusterName)
+	logger.Infof("deleted Fargate profile %q on EKS cluster %q", opts.ProfileName, clusterName)
 	return nil
 }
 

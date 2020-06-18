@@ -1,8 +1,8 @@
 package cmdutils
 
 import (
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/eks"
@@ -36,7 +36,7 @@ func (c *Cmd) NewCtl() (*eks.ClusterProvider, error) {
 		if c.Validate {
 			return nil, err
 		}
-		logger.Warning("ignoring validation error: %s", err.Error())
+		logger.Warnf("ignoring validation error: %s", err.Error())
 	}
 
 	for i, ng := range c.ClusterConfig.NodeGroups {
@@ -44,7 +44,7 @@ func (c *Cmd) NewCtl() (*eks.ClusterProvider, error) {
 			if c.Validate {
 				return nil, err
 			}
-			logger.Warning("ignoring validation error: %s", err.Error())
+			logger.Warnf("ignoring validation error: %s", err.Error())
 		}
 		// defaulting of nodegroup currently depends on validation;
 		// that may change, but at present that's how it's meant to work

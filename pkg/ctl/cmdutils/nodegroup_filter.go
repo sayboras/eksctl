@@ -1,7 +1,7 @@
 package cmdutils
 
 import (
-	"github.com/kris-nova/logger"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
@@ -75,7 +75,7 @@ func (f *NodeGroupFilter) SetIncludeOrExcludeMissingFilter(lister stackLister, i
 	for _, localNodeGroup := range getAllNodeGroupNames(clusterConfig) {
 		local.Insert(localNodeGroup)
 		if !stackExists(stacks, localNodeGroup) {
-			logger.Info("nodegroup %q present in the given config, but missing in the cluster", localNodeGroup)
+			logger.Infof("nodegroup %q present in the given config, but missing in the cluster", localNodeGroup)
 			f.AppendExcludeNames(localNodeGroup)
 		} else if includeOnlyMissing {
 			f.AppendExcludeNames(localNodeGroup)
@@ -85,7 +85,7 @@ func (f *NodeGroupFilter) SetIncludeOrExcludeMissingFilter(lister stackLister, i
 	for _, s := range stacks {
 		remoteNodeGroupName := s.NodeGroupName
 		if !local.Has(remoteNodeGroupName) {
-			logger.Info("nodegroup %q present in the cluster, but missing from the given config", s.NodeGroupName)
+			logger.Infof("nodegroup %q present in the cluster, but missing from the given config", s.NodeGroupName)
 			if includeOnlyMissing {
 				if s.Type == api.NodeGroupTypeManaged {
 					clusterConfig.ManagedNodeGroups = append(clusterConfig.ManagedNodeGroups, &api.ManagedNodeGroup{Name: s.NodeGroupName})

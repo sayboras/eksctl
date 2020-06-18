@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/weaveworks/eksctl/pkg/addons"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	appsv1 "k8s.io/api/apps/v1"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -27,7 +27,7 @@ func UpdateAWSNode(rawClient kubernetes.RawClientInterface, region string, plan 
 	clusterDaemonSet, err := rawClient.ClientSet().AppsV1().DaemonSets(metav1.NamespaceSystem).Get(AWSNode, metav1.GetOptions{})
 	if err != nil {
 		if apierrs.IsNotFound(err) {
-			logger.Warning("%q was not found", AWSNode)
+			logger.Warnf("%q was not found", AWSNode)
 			return false, nil
 		}
 		return false, errors.Wrapf(err, "getting %q", AWSNode)
@@ -85,13 +85,13 @@ func UpdateAWSNode(rawClient kubernetes.RawClientInterface, region string, plan 
 
 	if plan {
 		if tagMismatch {
-			logger.Critical("(plan) %q is not up-to-date", AWSNode)
+			logger.Fatalf("(plan) %q is not up-to-date", AWSNode)
 			return true, nil
 		}
-		logger.Info("(plan) %q is already up-to-date", AWSNode)
+		logger.Infof("(plan) %q is already up-to-date", AWSNode)
 		return false, nil
 	}
 
-	logger.Info("%q is now up-to-date", AWSNode)
+	logger.Infof("%q is now up-to-date", AWSNode)
 	return false, nil
 }

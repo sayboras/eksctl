@@ -3,8 +3,8 @@ package eks
 import (
 	"time"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/weaveworks/eksctl/pkg/fargate"
@@ -43,7 +43,7 @@ func DoCreateFargateProfiles(config *api.ClusterConfig, ctl *ClusterProvider) er
 	clusterName := config.Metadata.Name
 	awsClient := fargate.NewClientWithWaitTimeout(clusterName, ctl.Provider.EKS(), ctl.Provider.WaitTimeout())
 	for _, profile := range config.FargateProfiles {
-		logger.Info("creating Fargate profile %q on EKS cluster %q", profile.Name, clusterName)
+		logger.Infof("creating Fargate profile %q on EKS cluster %q", profile.Name, clusterName)
 
 		// Default the pod execution role ARN to be the same as the cluster
 		// role defined in CloudFormation:
@@ -58,7 +58,7 @@ func DoCreateFargateProfiles(config *api.ClusterConfig, ctl *ClusterProvider) er
 		if err := awsClient.CreateProfile(profile, true); err != nil {
 			return errors.Wrapf(err, "failed to create Fargate profile %q on EKS cluster %q", profile.Name, clusterName)
 		}
-		logger.Info("created Fargate profile %q on EKS cluster %q", profile.Name, clusterName)
+		logger.Infof("created Fargate profile %q on EKS cluster %q", profile.Name, clusterName)
 	}
 	return nil
 }

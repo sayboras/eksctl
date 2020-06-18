@@ -1,10 +1,10 @@
 package utils
 
 import (
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/ctl/cmdutils"
@@ -62,13 +62,13 @@ func doUpdateLegacySubnetSettings(cmd *cmdutils.Cmd) error {
 
 	stackManager := ctl.NewStackManager(cfg)
 
-	logger.Info("updating settings { MapPublicIpOnLaunch: enabled } for public subnets %q", cfg.PublicSubnetIDs())
+	logger.Infof("updating settings { MapPublicIpOnLaunch: enabled } for public subnets %q", cfg.PublicSubnetIDs())
 	err = stackManager.EnsureMapPublicIPOnLaunchEnabled()
 	if err != nil {
-		logger.Warning(err.Error())
+		logger.Warn(err.Error())
 		return err
 	}
 
-	logger.Success("public subnets up to date")
+	logger.Info("public subnets up to date")
 	return nil
 }

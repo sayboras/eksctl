@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	kubeclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 
@@ -29,9 +29,9 @@ func Setup(k8sRestConfig *rest.Config, k8sClientSet kubeclient.Interface, cfg *a
 	fluxIsInstalled, err := installer.IsFluxInstalled()
 	if err != nil {
 		// Continue with installation
-		logger.Warning(err.Error())
+		logger.Warn(err.Error())
 	} else if fluxIsInstalled {
-		logger.Warning("found existing flux deployment in namespace %q. Skipping installation",
+		logger.Warnf("found existing flux deployment in namespace %q. Skipping installation",
 			cfg.Git.Operator.Namespace)
 		return nil
 	}

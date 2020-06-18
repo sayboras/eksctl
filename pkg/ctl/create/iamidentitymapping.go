@@ -1,10 +1,10 @@
 package create
 
 import (
-	"github.com/kris-nova/logger"
 	"github.com/lithammer/dedent"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/authconfigmap"
@@ -96,7 +96,7 @@ func doCreateIAMIdentityMapping(cmd *cmdutils.Cmd, arn string, username string, 
 		arn := identity.ARN()
 
 		if createdArn == arn {
-			logger.Warning("found existing mappings with same arn %q (which will be shadowed by your new mapping)", createdArn)
+			logger.Warnf("found existing mappings with same arn %q (which will be shadowed by your new mapping)", createdArn)
 			break
 		}
 	}

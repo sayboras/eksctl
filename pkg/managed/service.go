@@ -11,12 +11,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/eks"
 	"github.com/blang/semver"
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
 	"github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/cfn/manager"
+	"github.com/weaveworks/eksctl/pkg/logger"
 )
 
 // A Service provides methods for managing managed nodegroups
@@ -150,10 +150,10 @@ func (m *Service) UpgradeNodeGroup(nodeGroupName, kubernetesVersion string, wait
 		if *param.Type == eks.UpdateParamTypeReleaseVersion {
 			newReleaseVersion := *param.Value
 			if newReleaseVersion == *nodegroupOutput.Nodegroup.ReleaseVersion {
-				logger.Info("nodegroup %q is already up-to-date (release version: %v)", nodeGroupName, *nodegroupOutput.Nodegroup.ReleaseVersion)
+				logger.Infof("nodegroup %q is already up-to-date (release version: %v)", nodeGroupName, *nodegroupOutput.Nodegroup.ReleaseVersion)
 				return nil
 			}
-			logger.Info("upgrading nodegroup to release version %v", newReleaseVersion)
+			logger.Infof("upgrading nodegroup to release version %v", newReleaseVersion)
 		}
 	}
 
@@ -183,7 +183,7 @@ func (m *Service) waitForUpdate(ctx context.Context, nodeGroupName string, updat
 			if !request.IsErrorRetryable(err) {
 				return describeErr
 			}
-			logger.Warning(describeErr.Error())
+			logger.Warn(describeErr.Error())
 		}
 
 		logger.Debug("DescribeUpdate output: %v", describeOutput.Update.String())

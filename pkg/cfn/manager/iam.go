@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	cfn "github.com/aws/aws-sdk-go/service/cloudformation"
-	"github.com/kris-nova/logger"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/cfn/builder"
@@ -20,7 +20,7 @@ func (c *StackCollection) makeIAMServiceAccountStackName(namespace, name string)
 // createIAMServiceAccountTask creates the iamserviceaccount in CloudFormation
 func (c *StackCollection) createIAMServiceAccountTask(errs chan error, spec *api.ClusterIAMServiceAccount, oidc *iamoidc.OpenIDConnectManager) error {
 	name := c.makeIAMServiceAccountStackName(spec.Namespace, spec.Name)
-	logger.Info("building iamserviceaccount stack %q", name)
+	logger.Infof("building iamserviceaccount stack %q", name)
 	stack := builder.NewIAMServiceAccountResourceSet(spec, oidc)
 	if err := stack.AddAllResources(); err != nil {
 		return err

@@ -2,9 +2,9 @@ package utils
 
 import (
 	"github.com/aws/aws-sdk-go/service/cloudformation"
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/ctl/cmdutils"
@@ -68,30 +68,30 @@ func doDescribeStacksCmd(cmd *cmdutils.Cmd, all, events, trail bool) error {
 	}
 
 	if len(stacks) < 2 {
-		logger.Warning("only %d stacks found, for a ready-to-use cluster there should be at least 2", len(stacks))
+		logger.Warnf("only %d stacks found, for a ready-to-use cluster there should be at least 2", len(stacks))
 	}
 
 	for _, s := range stacks {
 		if !all && *s.StackStatus == cloudformation.StackStatusDeleteComplete {
 			continue
 		}
-		logger.Info("stack/%s = %#v", *s.StackName, s)
+		logger.Infof("stack/%s = %#v", *s.StackName, s)
 		if events {
 			events, err := stackManager.DescribeStackEvents(s)
 			if err != nil {
-				logger.Critical(err.Error())
+				logger.Fatalf(err.Error())
 			}
 			for i, e := range events {
-				logger.Info("CloudFormation.events/%s[%d] = %#v", *s.StackName, i, e)
+				logger.Infof("CloudFormation.events/%s[%d] = %#v", *s.StackName, i, e)
 			}
 		}
 		if trail {
 			events, err := stackManager.LookupCloudTrailEvents(s)
 			if err != nil {
-				logger.Critical(err.Error())
+				logger.Fatalf(err.Error())
 			}
 			for i, e := range events {
-				logger.Info("CloudTrail.events/%s[%d] = %#v", *s.StackName, i, e)
+				logger.Infof("CloudTrail.events/%s[%d] = %#v", *s.StackName, i, e)
 			}
 		}
 	}

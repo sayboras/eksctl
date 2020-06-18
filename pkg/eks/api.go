@@ -31,8 +31,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/ssm/ssmiface"
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/aws/aws-sdk-go/service/sts/stsiface"
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/yaml"
@@ -347,7 +347,7 @@ func (c *ClusterProvider) SetAvailabilityZones(spec *api.ClusterConfig, given []
 		return errors.Wrap(err, "getting availability zones")
 	}
 
-	logger.Info("setting availability zones to %v", zones)
+	logger.Infof("setting availability zones to %v", zones)
 	spec.AvailabilityZones = zones
 
 	return nil
@@ -364,7 +364,7 @@ func (c *ClusterProvider) newSession(spec *api.ProviderConfig) *session.Session 
 	}
 
 	config = request.WithRetryer(config, newLoggingRetryer())
-	if logger.Level >= api.AWSDebugLevel {
+	if logger.Level() >= api.AWSDebugLevel {
 		config = config.WithLogLevel(aws.LogDebug |
 			aws.LogDebugWithHTTPBody |
 			aws.LogDebugWithRequestRetries |

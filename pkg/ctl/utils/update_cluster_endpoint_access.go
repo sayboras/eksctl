@@ -1,9 +1,9 @@
 package utils
 
 import (
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/ctl/cmdutils"
@@ -52,7 +52,7 @@ func doUpdateClusterEndpoints(cmd *cmdutils.Cmd, newPrivate bool, newPublic bool
 	if err != nil {
 		return err
 	}
-	logger.Info("using region %s", meta.Region)
+	logger.Infof("using region %s", meta.Region)
 
 	if err := ctl.CheckAuth(); err != nil {
 		return err
@@ -69,8 +69,7 @@ func doUpdateClusterEndpoints(cmd *cmdutils.Cmd, newPrivate bool, newPublic bool
 
 	curPrivate, curPublic := *clusterVPCConfig.ClusterEndpoints.PrivateAccess, *clusterVPCConfig.ClusterEndpoints.PublicAccess
 
-	logger.Info("current Kubernetes API endpoint access: privateAccess=%v, publicAccess=%v",
-		curPrivate, curPublic)
+	logger.Infof("current Kubernetes API endpoint access: privateAccess=%v, publicAccess=%v", curPrivate, curPublic)
 
 	if cfg.VPC.ClusterEndpoints.PrivateAccess == nil {
 		newPrivate = curPrivate
@@ -85,7 +84,7 @@ func doUpdateClusterEndpoints(cmd *cmdutils.Cmd, newPrivate bool, newPublic bool
 
 	// Nothing changed?
 	if newPrivate == curPrivate && newPublic == curPublic {
-		logger.Success("Kubernetes API endpoint access for cluster %q in %q is already up to date",
+		logger.Infof("Kubernetes API endpoint access for cluster %q in %q is already up to date",
 			meta.Name, meta.Region)
 		return nil
 	}
@@ -103,7 +102,7 @@ func doUpdateClusterEndpoints(cmd *cmdutils.Cmd, newPrivate bool, newPublic bool
 
 	// if it's a private only cluster warn the user
 	if api.PrivateOnly(cfg.VPC.ClusterEndpoints) {
-		logger.Warning(api.ErrClusterEndpointPrivateOnly.Error())
+		logger.Warnf(api.ErrClusterEndpointPrivateOnly.Error())
 	}
 
 	if !cmd.Plan {

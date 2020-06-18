@@ -6,8 +6,8 @@ import (
 
 	"github.com/blang/semver"
 	"github.com/kballard/go-shellquote"
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	"github.com/weaveworks/eksctl/pkg/utils/kubeconfig"
 	"github.com/weaveworks/launcher/pkg/kubectl"
@@ -92,7 +92,7 @@ func CheckAllCommands(kubeconfigPath string, isContextSet bool, contextName stri
 			return fmt.Errorf("Kubernetes version %s found, v1.10.0 or newer is expected with EKS %s", serverVersion, suggestion)
 		}
 
-		logger.Info("kubectl command should work with %q, try '%s'", kubeconfigPath, fmtKubectlCmd(ktl, "get", "nodes"))
+		logger.Infof("kubectl command should work with %q, try '%s'", kubeconfigPath, fmtKubectlCmd(ktl, "get", "nodes"))
 	} else {
 		logger.Debug("skipping kubectl integration checks, as writing kubeconfig file is disabled")
 	}

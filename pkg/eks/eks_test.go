@@ -9,8 +9,6 @@ import (
 	cfn "github.com/aws/aws-sdk-go/service/cloudformation"
 	awseks "github.com/aws/aws-sdk-go/service/eks"
 
-	"github.com/kris-nova/logger"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -58,7 +56,7 @@ var _ = Describe("EKS API wrapper", func() {
 
 			Context("and normal log level", func() {
 				BeforeEach(func() {
-					logger.Level = 3
+					//logger.Level = 3
 				})
 
 				JustBeforeEach(func() {
@@ -100,7 +98,7 @@ var _ = Describe("EKS API wrapper", func() {
 						"REVIEW_IN_PROGRESS",
 					}
 
-					logger.Level = 4
+					//logger.Level = 4
 
 					p.MockCloudFormation().On("ListStacksPages", mock.MatchedBy(func(input *cfn.ListStacksInput) bool {
 						matches := 0
@@ -146,7 +144,7 @@ var _ = Describe("EKS API wrapper", func() {
 				os.Stdout = writer
 
 				clusterName = "test-cluster"
-				logger.Level = 1
+				//logger.Level = 1
 
 				p = mockprovider.NewMockProvider()
 

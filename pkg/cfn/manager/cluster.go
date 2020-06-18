@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	cfn "github.com/aws/aws-sdk-go/service/cloudformation"
 
@@ -29,7 +29,7 @@ func (c *StackCollection) makeClusterStackName() string {
 // createClusterTask creates the cluster
 func (c *StackCollection) createClusterTask(errs chan error, supportsManagedNodes bool) error {
 	name := c.makeClusterStackName()
-	logger.Info("building cluster stack %q", name)
+	logger.Infof("building cluster stack %q", name)
 	stack := builder.NewClusterResourceSet(c.provider, c.spec, supportsManagedNodes, nil)
 	if err := stack.AddAllResources(); err != nil {
 		return err
@@ -112,7 +112,7 @@ func (c *StackCollection) AppendNewClusterStackResource(plan, supportsManagedNod
 		return false, fmt.Errorf("unexpected template format of the current stack ")
 	}
 
-	logger.Info("re-building cluster stack %q", name)
+	logger.Infof("re-building cluster stack %q", name)
 	newStack := builder.NewClusterResourceSet(c.provider, c.spec, supportsManagedNodes, &currentResources)
 	if err := newStack.AddAllResources(); err != nil {
 		return false, err
@@ -172,7 +172,7 @@ func (c *StackCollection) AppendNewClusterStackResource(plan, supportsManagedNod
 	}
 
 	if len(addResources) == 0 && len(addOutputs) == 0 && len(addMappings) == 0 {
-		logger.Success("all resources in cluster stack %q are up-to-date", name)
+		logger.Infof("all resources in cluster stack %q are up-to-date", name)
 		return false, nil
 	}
 
@@ -180,7 +180,7 @@ func (c *StackCollection) AppendNewClusterStackResource(plan, supportsManagedNod
 
 	describeUpdate := fmt.Sprintf("updating stack to add new resources %v and outputs %v", addResources, addOutputs)
 	if plan {
-		logger.Info("(plan) %s", describeUpdate)
+		logger.Infof("(plan) %s", describeUpdate)
 		return true, nil
 	}
 	return true, c.UpdateStack(name, c.MakeChangeSetName("update-cluster"), describeUpdate, TemplateBody(currentTemplate), nil)

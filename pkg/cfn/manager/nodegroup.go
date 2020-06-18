@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	cfn "github.com/aws/aws-sdk-go/service/cloudformation"
 
@@ -50,7 +50,7 @@ func (c *StackCollection) makeNodeGroupStackName(name string) string {
 // createNodeGroupTask creates the nodegroup
 func (c *StackCollection) createNodeGroupTask(errs chan error, ng *api.NodeGroup, supportsManagedNodes bool) error {
 	name := c.makeNodeGroupStackName(ng.Name)
-	logger.Info("building nodegroup stack %q", name)
+	logger.Infof("building nodegroup stack %q", name)
 	stack := builder.NewNodeGroupResourceSet(c.provider, c.spec, c.makeClusterStackName(), ng, supportsManagedNodes)
 	if err := stack.AddAllResources(); err != nil {
 		return err
@@ -68,7 +68,7 @@ func (c *StackCollection) createNodeGroupTask(errs chan error, ng *api.NodeGroup
 
 func (c *StackCollection) createManagedNodeGroupTask(errorCh chan error, ng *api.ManagedNodeGroup) error {
 	name := c.makeNodeGroupStackName(ng.Name)
-	logger.Info("building managed nodegroup stack %q", name)
+	logger.Infof("building managed nodegroup stack %q", name)
 	stack := builder.NewManagedNodeGroup(c.spec, ng, c.makeClusterStackName())
 	if err := stack.AddAllResources(); err != nil {
 		return err
@@ -153,7 +153,7 @@ func (c *StackCollection) ScaleNodeGroup(ng *api.NodeGroup) error {
 	clusterName := c.makeClusterStackName()
 	c.spec.Status = &api.ClusterStatus{StackName: clusterName}
 	name := c.makeNodeGroupStackName(ng.Name)
-	logger.Info("scaling nodegroup stack %q in cluster %s", name, clusterName)
+	logger.Infof("scaling nodegroup stack %q in cluster %s", name, clusterName)
 
 	stack, err := c.DescribeStack(&Stack{StackName: &name})
 	if err != nil {
@@ -195,18 +195,18 @@ func (c *StackCollection) ScaleNodeGroup(ng *api.NodeGroup) error {
 	changed := hasChanged(ng.DesiredCapacity, currentCapacity) || hasChanged(ng.MaxSize, currentMaxSize) || hasChanged(ng.MinSize, currentMinSize)
 
 	if !changed {
-		logger.Info("no change for nodegroup %q in cluster %q: nodes-min %d, desired %d, nodes-max %d", ng.Name,
+		logger.Infof("no change for nodegroup %q in cluster %q: nodes-min %d, desired %d, nodes-max %d", ng.Name,
 			clusterName, currentMinSize.Int(), *ng.DesiredCapacity, currentMaxSize.Int())
 		return nil
 	}
 
 	if ng.MinSize == nil && int64(*ng.DesiredCapacity) < currentMinSize.Int() {
-		logger.Warning("the desired nodes %d is less than current nodes-min/minSize %d", *ng.DesiredCapacity, currentMinSize.Int())
+		logger.Warnf("the desired nodes %d is less than current nodes-min/minSize %d", *ng.DesiredCapacity, currentMinSize.Int())
 		return errors.Errorf("the desired nodes %d is less than current nodes-min/minSize %d", *ng.DesiredCapacity, currentMinSize.Int())
 	}
 
 	if ng.MaxSize == nil && int64(*ng.DesiredCapacity) > currentMaxSize.Int() {
-		logger.Warning("the desired nodes %d is greater than current nodes-max/maxSize %d", *ng.DesiredCapacity, currentMaxSize.Int())
+		logger.Warnf("the desired nodes %d is greater than current nodes-max/maxSize %d", *ng.DesiredCapacity, currentMaxSize.Int())
 		return errors.Errorf("the desired nodes %d is greater than current nodes-max/maxSize %d", *ng.DesiredCapacity, currentMaxSize.Int())
 	}
 

@@ -3,7 +3,7 @@ package ami
 import (
 	"fmt"
 
-	"github.com/kris-nova/logger"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	"github.com/weaveworks/eksctl/pkg/utils"
 )
 
@@ -36,7 +36,7 @@ func (r *StaticGPUResolver) Resolve(region, version, instanceType, imageFamily s
 
 	regionalAMIs, ok := StaticImages[version][imageFamily][ImageClassGPU]
 	if !ok {
-		logger.Critical("image family %s doesn't support GPU image class", imageFamily)
+		logger.Fatalf("image family %s doesn't support GPU image class", imageFamily)
 		return "", NewErrFailedResolution(region, version, instanceType, imageFamily)
 	}
 

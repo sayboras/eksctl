@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -68,7 +68,7 @@ func MaybeCreateNamespace(clientSet Interface, name string) error {
 		} else if err != nil {
 			return err
 		}
-		logger.Info("created namespace %q", name)
+		logger.Infof("created namespace %q", name)
 	}
 	return nil
 }

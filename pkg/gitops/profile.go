@@ -11,9 +11,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/git"
@@ -93,7 +93,7 @@ func (p *Profile) Install(clusterConfig *api.ClusterConfig) error {
 
 	logger.Debug("deleting cloned directory %q", usersRepoDir)
 	if err := p.IO.RemoveAll(usersRepoDir); err != nil {
-		logger.Warning("unable to delete cloned directory %q", usersRepoDir)
+		logger.Warnf("unable to delete cloned directory %q", usersRepoDir)
 	}
 	return nil
 }
@@ -108,7 +108,7 @@ func (p *Profile) Generate(profile api.Profile) error {
 		return errors.Wrap(err, "please supply a valid Quick Start name or URL")
 	}
 
-	logger.Info("cloning repository %q:%s", profile.Source, profile.Revision)
+	logger.Infof("cloning repository %q:%s", profile.Source, profile.Revision)
 	options := git.CloneOptions{
 		URL:    profile.Source,
 		Branch: profile.Revision,
@@ -134,7 +134,7 @@ func (p *Profile) Generate(profile api.Profile) error {
 	}
 
 	if len(outputFiles) > 0 {
-		logger.Info("writing new manifests to %q", profile.OutputPath)
+		logger.Infof("writing new manifests to %q", profile.OutputPath)
 	} else {
 		logger.Info("no template files found, nothing to write")
 		return nil
@@ -152,7 +152,7 @@ func (p *Profile) Generate(profile api.Profile) error {
 	}
 	logger.Debug("deleting cloned directory %q", clonedDir)
 	if err := p.IO.RemoveAll(clonedDir); err != nil {
-		logger.Warning("unable to delete cloned directory %q", clonedDir)
+		logger.Warnf("unable to delete cloned directory %q", clonedDir)
 	}
 
 	return nil
@@ -188,7 +188,7 @@ func (p *Profile) loadFiles(directory string) ([]fileprocessor.File, error) {
 func (p *Profile) ignoreFiles(baseDir string) error {
 	ignoreFilePath := path.Join(baseDir, eksctlIgnoreFilename)
 	if exists, _ := p.IO.Exists(ignoreFilePath); exists {
-		logger.Info("ignoring files declared in %s", eksctlIgnoreFilename)
+		logger.Infof("ignoring files declared in %s", eksctlIgnoreFilename)
 		file, err := p.IO.Open(ignoreFilePath)
 		if err != nil {
 			return err
@@ -205,7 +205,7 @@ func (p *Profile) ignoreFiles(baseDir string) error {
 			if err != nil {
 				return err
 			}
-			logger.Info("ignored %q", pathToIgnore)
+			logger.Infof("ignored %q", pathToIgnore)
 		}
 
 		// Remove the ignore file after finish

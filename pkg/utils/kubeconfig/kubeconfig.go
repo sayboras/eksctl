@@ -10,9 +10,9 @@ import (
 	"os/exec"
 
 	"github.com/gofrs/flock"
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	"github.com/weaveworks/eksctl/pkg/utils/file"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
@@ -233,7 +233,7 @@ func Write(path string, newConfig clientcmdapi.Config, setContext bool) (string,
 
 	defer func() {
 		if err := unlockConfigFile(configFileName); err != nil {
-			logger.Critical(err.Error())
+			logger.Fatal(err.Error())
 		}
 	}()
 
@@ -316,12 +316,12 @@ func MaybeDeleteConfig(meta *api.ClusterMeta) {
 	if file.Exists(p) {
 		err := lockConfigFile(p)
 		if err != nil {
-			logger.Critical(err.Error())
+			logger.Fatal(err.Error())
 		}
 
 		defer func() {
 			if err := unlockConfigFile(p); err != nil {
-				logger.Critical(err.Error())
+				logger.Fatal(err.Error())
 			}
 		}()
 
@@ -339,12 +339,12 @@ func MaybeDeleteConfig(meta *api.ClusterMeta) {
 	defaultFilename := configAccess.GetDefaultFilename()
 	err := lockConfigFile(defaultFilename)
 	if err != nil {
-		logger.Critical(err.Error())
+		logger.Fatalf(err.Error())
 	}
 
 	defer func() {
 		if err := unlockConfigFile(defaultFilename); err != nil {
-			logger.Critical(err.Error())
+			logger.Fatalf(err.Error())
 		}
 	}()
 
@@ -361,7 +361,7 @@ func MaybeDeleteConfig(meta *api.ClusterMeta) {
 	if err := clientcmd.ModifyConfig(configAccess, *config, true); err != nil {
 		logger.Debug("ignoring error while failing to update config file %q: %s", DefaultPath(), err.Error())
 	} else {
-		logger.Success("kubeconfig has been updated")
+		logger.Info("kubeconfig has been updated")
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/kris-nova/logger"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	"github.com/aws/aws-sdk-go/aws"
 	cfn "github.com/aws/aws-sdk-go/service/cloudformation"
@@ -60,7 +60,7 @@ func SetSubnets(spec *api.ClusterConfig) error {
 		vpc.Subnets.Public[zone] = api.Network{
 			CIDR: &ipnet.IPNet{IPNet: *public},
 		}
-		logger.Info("subnets for %s - public:%s private:%s", zone, public.String(), private.String())
+		logger.Infof("subnets for %s - public:%s private:%s", zone, public.String(), private.String())
 	}
 
 	return nil
@@ -265,13 +265,13 @@ func ValidateLegacySubnetsForNodeGroups(spec *api.ClusterConfig, provider api.Cl
 	if err := ValidateExistingPublicSubnets(provider, subnetsToValidate.List()); err != nil {
 		// If the cluster endpoint is reachable from the VPC nodes might still be able to join
 		if spec.HasPrivateEndpointAccess() {
-			logger.Warning("public subnets for one or more nodegroups have %q disabled. This means that nodes won't "+
+			logger.Warnf("public subnets for one or more nodegroups have %q disabled. This means that nodes won't "+
 				"get public IP addresses. If they can't reach the cluster through the private endpoint they won't be "+
 				"able to join the cluster", "MapPublicIpOnLaunch")
 			return nil
 		}
 
-		logger.Critical(err.Error())
+		logger.Fatal(err.Error())
 		return errors.Errorf("subnets for one or more new nodegroups don't meet requirements. "+
 			"To fix this, please run `eksctl utils update-legacy-subnet-settings --cluster %s`",
 			spec.Metadata.Name)

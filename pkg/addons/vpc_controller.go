@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/cloudflare/cfssl/csr"
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/kubernetes"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/typed/certificates/v1beta1"
 
@@ -174,7 +174,7 @@ func watchCSRApproval(csrClientSet v1beta1.CertificateSigningRequestInterface, c
 				if cert := req.Status.Certificate; cert != nil {
 					return cert, nil
 				}
-				logger.Warning("certificate not yet available (event: %s)", event.Type)
+				logger.Warnf("certificate not yet available (event: %s)", event.Type)
 			}
 		case <-timer.C:
 			return nil, fmt.Errorf("timed out (after %v) waiting for certificate", timeout)

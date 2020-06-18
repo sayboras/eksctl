@@ -4,12 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
-	"github.com/weaveworks/eksctl/pkg/ctl/set"
-	"github.com/weaveworks/eksctl/pkg/ctl/unset"
-	"github.com/weaveworks/eksctl/pkg/ctl/upgrade"
-
 	"github.com/weaveworks/eksctl/pkg/ctl/cmdutils"
 	"github.com/weaveworks/eksctl/pkg/ctl/completion"
 	"github.com/weaveworks/eksctl/pkg/ctl/create"
@@ -19,8 +14,12 @@ import (
 	"github.com/weaveworks/eksctl/pkg/ctl/generate"
 	"github.com/weaveworks/eksctl/pkg/ctl/get"
 	"github.com/weaveworks/eksctl/pkg/ctl/scale"
+	"github.com/weaveworks/eksctl/pkg/ctl/set"
+	"github.com/weaveworks/eksctl/pkg/ctl/unset"
 	"github.com/weaveworks/eksctl/pkg/ctl/update"
+	"github.com/weaveworks/eksctl/pkg/ctl/upgrade"
 	"github.com/weaveworks/eksctl/pkg/ctl/utils"
+	"github.com/weaveworks/eksctl/pkg/logger"
 )
 
 func addCommands(rootCmd *cobra.Command, flagGrouping *cmdutils.FlagGrouping) {
@@ -61,16 +60,12 @@ func main() {
 	checkCommand(rootCmd)
 
 	rootCmd.PersistentFlags().BoolP("help", "h", false, "help for this command")
-	rootCmd.PersistentFlags().IntVarP(&logger.Level, "verbose", "v", 3, "set log level, use 0 to silence, 4 for debugging and 5 for debugging with AWS debug logging")
 
-	colorValue := rootCmd.PersistentFlags().StringP("color", "C", "true", "toggle colorized logs (valid options: true, false, fabulous)")
+	var logLevel int
+	rootCmd.PersistentFlags().IntVarP(&logLevel, "verbose", "v", 3, "set log level, use 0 to silence, 4 for debugging and 5 for debugging with AWS debug logging")
 
 	cobra.OnInitialize(func() {
-		// Control colored output
-		logger.Color = *colorValue == "true"
-		logger.Fabulous = *colorValue == "fabulous"
-		// Add timestamps for debugging
-		logger.Timestamps = logger.Level >= 4
+		logger.Configure(logLevel)
 	})
 
 	rootCmd.SetUsageFunc(flagGrouping.Usage)
@@ -93,7 +88,7 @@ func checkCommand(rootCmd *cobra.Command) {
 			} else {
 				e = fmt.Errorf("unknown resource type \"%s\"", args[0])
 			}
-			fmt.Printf("Error: %s\n\n", e.Error())
+			fmt.Printf("Errorf: %s\n\n", e.Error())
 
 			if err := c.Help(); err != nil {
 				logger.Debug("ignoring cobra error %q", err.Error())

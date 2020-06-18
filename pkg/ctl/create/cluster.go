@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/weaveworks/eksctl/pkg/eks"
@@ -125,7 +125,7 @@ func doCreateCluster(cmd *cmdutils.Cmd, ng *api.NodeGroup, params *cmdutils.Crea
 
 	// if it's a private only cluster warn the user
 	if api.PrivateOnly(cfg.VPC.ClusterEndpoints) {
-		logger.Warning(api.ErrClusterEndpointPrivateOnly.Error())
+		logger.Warn(api.ErrClusterEndpointPrivateOnly.Error())
 	}
 
 	if err := ctl.CheckAuth(); err != nil {
@@ -222,8 +222,8 @@ func doCreateCluster(cmd *cmdutils.Cmd, ng *api.NodeGroup, params *cmdutils.Crea
 				}
 			}
 
-			logger.Success("using %s from kops cluster %q", subnetInfo(), params.KopsClusterNameForVPC)
-			logger.Warning(customNetworkingNotice)
+			logger.Infof("using %s from kops cluster %q", subnetInfo(), params.KopsClusterNameForVPC)
+			logger.Warn(customNetworkingNotice)
 			return nil
 		}
 
@@ -241,7 +241,7 @@ func doCreateCluster(cmd *cmdutils.Cmd, ng *api.NodeGroup, params *cmdutils.Crea
 		}
 
 		if err := cfg.HasSufficientSubnets(); err != nil {
-			logger.Critical("unable to use given %s", subnetInfo())
+			logger.Fatalf("unable to use given %s", subnetInfo())
 			return err
 		}
 
@@ -251,8 +251,8 @@ func doCreateCluster(cmd *cmdutils.Cmd, ng *api.NodeGroup, params *cmdutils.Crea
 			}
 		}
 
-		logger.Success("using existing %s", subnetInfo())
-		logger.Warning(customNetworkingNotice)
+		logger.Infof("using existing %s", subnetInfo())
+		logger.Warn(customNetworkingNotice)
 		return nil
 	}
 
@@ -265,7 +265,7 @@ func doCreateCluster(cmd *cmdutils.Cmd, ng *api.NodeGroup, params *cmdutils.Crea
 		if err := eks.EnsureAMI(ctl.Provider, meta.Version, ng); err != nil {
 			return err
 		}
-		logger.Info("nodegroup %q will use %q [%s/%s]", ng.Name, ng.AMI, ng.AMIFamily, cfg.Metadata.Version)
+		logger.Infof("nodegroup %q will use %q [%s/%s]", ng.Name, ng.AMI, ng.AMIFamily, cfg.Metadata.Version)
 
 		// load or use SSH key - name includes cluster name and the
 		// fingerprint, so if unique keys provided, each will get
@@ -285,14 +285,14 @@ func doCreateCluster(cmd *cmdutils.Cmd, ng *api.NodeGroup, params *cmdutils.Crea
 		return err
 	}
 
-	logger.Info("using Kubernetes version %s", meta.Version)
-	logger.Info("creating %s", cfg.LogString())
+	logger.Infof("using Kubernetes version %s", meta.Version)
+	logger.Infof("creating %s", cfg.LogString())
 
 	// TODO dry-run mode should provide a way to render config with all defaults set
 	// we should also make a call to resolve the AMI and write the result, similarly
 	// the body of the SSH key can be read
 
-	if err := printer.LogObj(logger.Debug, "cfg.json = \\\n%s\n", cfg); err != nil {
+	if err := printer.LogObj("cfg.json = \\\n%s\n", cfg); err != nil {
 		return err
 	}
 
@@ -300,7 +300,7 @@ func doCreateCluster(cmd *cmdutils.Cmd, ng *api.NodeGroup, params *cmdutils.Crea
 		stackManager := ctl.NewStackManager(cfg)
 		if cmd.ClusterConfigFile == "" {
 			logMsg := func(resource string) {
-				logger.Info("will create 2 separate CloudFormation stacks for cluster itself and the initial %s", resource)
+				logger.Infof("will create 2 separate CloudFormation stacks for cluster itself and the initial %s", resource)
 			}
 			if len(cfg.NodeGroups) == 1 {
 				logMsg("nodegroup")
@@ -309,7 +309,7 @@ func doCreateCluster(cmd *cmdutils.Cmd, ng *api.NodeGroup, params *cmdutils.Crea
 			}
 		} else {
 			logMsg := func(resource string, count int) {
-				logger.Info("will create a CloudFormation stack for cluster itself and %d %s stack(s)", count, resource)
+				logger.Infof("will create a CloudFormation stack for cluster itself and %d %s stack(s)", count, resource)
 			}
 			logFiltered()
 
@@ -317,7 +317,7 @@ func doCreateCluster(cmd *cmdutils.Cmd, ng *api.NodeGroup, params *cmdutils.Crea
 			logMsg("managed nodegroup", len(cfg.ManagedNodeGroups))
 		}
 
-		logger.Info("if you encounter any issues, check CloudFormation console or try 'eksctl utils describe-stacks --region=%s --cluster=%s'", meta.Region, meta.Name)
+		logger.Infof("if you encounter any issues, check CloudFormation console or try 'eksctl utils describe-stacks --region=%s --cluster=%s'", meta.Region, meta.Name)
 		supportsManagedNodes, err := eks.VersionSupportsManagedNodes(cfg.Metadata.Version)
 		if err != nil {
 			return err
@@ -327,10 +327,10 @@ func doCreateCluster(cmd *cmdutils.Cmd, ng *api.NodeGroup, params *cmdutils.Crea
 
 		logger.Info(tasks.Describe())
 		if errs := tasks.DoAllSync(); len(errs) > 0 {
-			logger.Warning("%d error(s) occurred and cluster hasn't been created properly, you may wish to check CloudFormation console", len(errs))
-			logger.Info("to cleanup resources, run 'eksctl delete cluster --region=%s --name=%s'", meta.Region, meta.Name)
+			logger.Warnf("%d error(s) occurred and cluster hasn't been created properly, you may wish to check CloudFormation console", len(errs))
+			logger.Infof("to cleanup resources, run 'eksctl delete cluster --region=%s --name=%s'", meta.Region, meta.Name)
 			for _, err := range errs {
-				logger.Critical("%s\n", err.Error())
+				logger.Fatalf("%s\n", err.Error())
 			}
 			return fmt.Errorf("failed to create cluster %q", meta.Name)
 		}
@@ -349,9 +349,9 @@ func doCreateCluster(cmd *cmdutils.Cmd, ng *api.NodeGroup, params *cmdutils.Crea
 
 			params.KubeconfigPath, err = kubeconfig.Write(params.KubeconfigPath, *kubectlConfig, params.SetContext)
 			if err != nil {
-				logger.Warning("unable to write kubeconfig %s, please retry with 'eksctl utils write-kubeconfig -n %s': %v", params.KubeconfigPath, meta.Name, err)
+				logger.Warnf("unable to write kubeconfig %s, please retry with 'eksctl utils write-kubeconfig -n %s': %v", params.KubeconfigPath, meta.Name, err)
 			} else {
-				logger.Success("saved kubeconfig as %q", params.KubeconfigPath)
+				logger.Infof("saved kubeconfig as %q", params.KubeconfigPath)
 			}
 		} else {
 			params.KubeconfigPath = ""
@@ -376,14 +376,14 @@ func doCreateCluster(cmd *cmdutils.Cmd, ng *api.NodeGroup, params *cmdutils.Crea
 
 		logger.Info(tasks.Describe())
 		if errs := tasks.DoAllSync(); len(errs) > 0 {
-			logger.Warning("%d error(s) occurred and post actions have failed, you may wish to check CloudFormation console", len(errs))
-			logger.Info("to cleanup resources, run 'eksctl delete cluster --region=%s --name=%s'", meta.Region, meta.Name)
+			logger.Warnf("%d error(s) occurred and post actions have failed, you may wish to check CloudFormation console", len(errs))
+			logger.Infof("to cleanup resources, run 'eksctl delete cluster --region=%s --name=%s'", meta.Region, meta.Name)
 			for _, err := range errs {
-				logger.Critical("%s\n", err.Error())
+				logger.Fatalf("%s\n", err.Error())
 			}
 			return fmt.Errorf("failed to create cluster %q", meta.Name)
 		}
-		logger.Success("all EKS cluster resources for %q have been created", meta.Name)
+		logger.Infof("all EKS cluster resources for %q have been created", meta.Name)
 
 		for _, ng := range cfg.NodeGroups {
 			// authorise nodes to join
@@ -430,14 +430,14 @@ func doCreateCluster(cmd *cmdutils.Cmd, ng *api.NodeGroup, params *cmdutils.Crea
 			return err
 		}
 		if err := kubectl.CheckAllCommands(params.KubeconfigPath, params.SetContext, kubeconfigContextName, env); err != nil {
-			logger.Critical("%s\n", err.Error())
+			logger.Fatalf("%s\n", err.Error())
 			logger.Info("cluster should be functional despite missing (or misconfigured) client binaries")
 		}
 	}
 
-	logger.Success("%s is ready", meta.LogString())
+	logger.Infof("%s is ready", meta.LogString())
 
-	if err := printer.LogObj(logger.Debug, "cfg.json = \\\n%s\n", cfg); err != nil {
+	if err := printer.LogObj("cfg.json = \\\n%s\n", cfg); err != nil {
 		return err
 	}
 

@@ -5,8 +5,8 @@ import (
 
 	cfn "github.com/aws/aws-sdk-go/service/cloudformation"
 	gfn "github.com/awslabs/goformation/cloudformation"
-	"github.com/kris-nova/logger"
 	"github.com/weaveworks/eksctl/pkg/cfn/outputs"
+	"github.com/weaveworks/eksctl/pkg/logger"
 )
 
 // makeImportValue imports output of another stack

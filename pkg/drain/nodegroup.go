@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/weaveworks/eksctl/pkg/eks"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -23,7 +23,7 @@ func evictPods(drainer *Helper, node *corev1.Node) (int, error) {
 		return 0, fmt.Errorf("errs: %v", errs) // TODO: improve formatting
 	}
 	if w := list.Warnings(); w != "" {
-		logger.Warning(w)
+		logger.Warn(w)
 	}
 	pods := list.Pods()
 	pending := len(pods)
@@ -100,7 +100,7 @@ func NodeGroup(clientSet kubernetes.Interface, ng eks.KubeNodeGroup, waitTimeout
 			}
 
 			if len(nodes.Items) == 0 {
-				logger.Warning("no nodes found in nodegroup %q (label selector: %q)", ng.NameString(), ng.ListOptions().LabelSelector)
+				logger.Warnf("no nodes found in nodegroup %q (label selector: %q)", ng.NameString(), ng.ListOptions().LabelSelector)
 				return nil
 			}
 
@@ -116,12 +116,12 @@ func NodeGroup(clientSet kubernetes.Interface, ng eks.KubeNodeGroup, waitTimeout
 				if c.IsUpdateRequired() {
 					err, patchErr := c.PatchOrReplace(clientSet)
 					if patchErr != nil {
-						logger.Warning(patchErr.Error())
+						logger.Warn(patchErr.Error())
 					}
 					if err != nil {
-						logger.Critical(err.Error())
+						logger.Fatal(err.Error())
 					}
-					logger.Info("%s node %q", cordonStatus(desired), node.Name)
+					logger.Infof("%s node %q", cordonStatus(desired), node.Name)
 				} else {
 					logger.Debug("no need to %s node %q", cordonStatus(desired), node.Name)
 				}
@@ -132,7 +132,7 @@ func NodeGroup(clientSet kubernetes.Interface, ng eks.KubeNodeGroup, waitTimeout
 			}
 
 			if drainedNodes.HasAll(newPendingNodes.List()...) {
-				logger.Success("drained nodes: %v", drainedNodes.List())
+				logger.Infof("drained nodes: %v", drainedNodes.List())
 				return nil // no new nodes were seen
 			}
 
@@ -144,7 +144,7 @@ func NodeGroup(clientSet kubernetes.Interface, ng eks.KubeNodeGroup, waitTimeout
 				if newPendingNodes.Has(node.Name) {
 					pending, err := evictPods(drainer, &node)
 					if err != nil {
-						logger.Warning("pod eviction error (%q) on node %s – will retry after delay of %s", err, node.Name, retryDelay)
+						logger.Warnf("pod eviction error (%q) on node %s – will retry after delay of %s", err, node.Name, retryDelay)
 						retryTimer := time.NewTimer(retryDelay)
 						select {
 						case <-retryTimer.C:

@@ -3,10 +3,10 @@ package cmdutils
 import (
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/kris-nova/logger"
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/cfn/manager"
 	"github.com/weaveworks/eksctl/pkg/kubernetes"
+	"github.com/weaveworks/eksctl/pkg/logger"
 )
 
 // IAMServiceAccountFilter holds filter configuration
@@ -85,17 +85,17 @@ func (f *IAMServiceAccountFilter) SetIncludeOrExcludeMissingFilter(stackManager 
 		localServiceAccountName := localServiceAccount.NameString()
 		local.Insert(localServiceAccountName)
 		if !remote.Has(localServiceAccountName) {
-			logger.Info("iamserviceaccounts %q present in the given config, but missing in the cluster", localServiceAccountName)
+			logger.Infof("iamserviceaccounts %q present in the given config, but missing in the cluster", localServiceAccountName)
 			f.AppendExcludeNames(localServiceAccountName)
 		} else if includeOnlyMissing {
-			logger.Info("iamserviceaccounts %q present in the given config and the cluster", localServiceAccountName)
+			logger.Infof("iamserviceaccounts %q present in the given config and the cluster", localServiceAccountName)
 			f.AppendExcludeNames(localServiceAccountName)
 		}
 	}
 
 	for remoteServiceAccountName := range remote {
 		if !local.Has(remoteServiceAccountName) {
-			logger.Info("iamserviceaccounts %q present in the cluster, but missing from the given config", remoteServiceAccountName)
+			logger.Infof("iamserviceaccounts %q present in the cluster, but missing from the given config", remoteServiceAccountName)
 			if includeOnlyMissing {
 				// append it to the config object, so that `saFilter.ForEach` knows about it
 				meta, err := api.ClusterIAMServiceAccountNameStringToClusterIAMMeta(remoteServiceAccountName)

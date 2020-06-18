@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go/service/ec2/ec2iface"
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	"github.com/weaveworks/eksctl/pkg/utils"
 )
 
@@ -72,14 +72,14 @@ func (r *AutoResolver) Resolve(region, version, instanceType, imageFamily string
 		var ok bool
 		namePattern, ok = imageClasses[ImageClassGPU]
 		if !ok {
-			logger.Critical("image family %s doesn't support GPU image class", imageFamily)
+			logger.Fatalf("image family %s doesn't support GPU image class", imageFamily)
 			return "", NewErrFailedResolution(region, version, instanceType, imageFamily)
 		}
 	}
 
 	ownerAccount, err := OwnerAccountID(imageFamily, region)
 	if err != nil {
-		logger.Critical("%v", err)
+		logger.Fatal(err)
 		return "", NewErrFailedResolution(region, version, instanceType, imageFamily)
 	}
 

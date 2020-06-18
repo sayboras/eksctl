@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/arn"
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	awseks "github.com/aws/aws-sdk-go/service/eks"
 
@@ -101,7 +101,7 @@ func ClusterSupportsManagedNodes(cluster *awseks.Cluster) (bool, error) {
 	}
 
 	if cluster.PlatformVersion == nil {
-		logger.Warning("could not find cluster's platform version")
+		logger.Warn("could not find cluster's platform version")
 		return false, nil
 	}
 	version, err := PlatformVersion(*cluster.PlatformVersion)
@@ -139,7 +139,7 @@ func ClusterSupportsFargate(cluster *awseks.Cluster) (bool, error) {
 	}
 
 	if cluster.PlatformVersion == nil {
-		logger.Warning("could not find cluster's platform version")
+		logger.Warn("could not find cluster's platform version")
 		return false, nil
 	}
 	version, err := PlatformVersion(*cluster.PlatformVersion)
@@ -315,7 +315,7 @@ func (c *ClusterProvider) doListClusters(chunkSize int64, printer printers.Outpu
 				WaitTimeout: c.Provider.WaitTimeout(),
 			}
 			if err := New(spec, nil).doListClusters(chunkSize, printer, allClusters, false); err != nil {
-				logger.Critical("error listing clusters in %q region: %s", region, err.Error())
+				logger.Fatalf("error listing clusters in %q region: %s", region, err.Error())
 			}
 		}
 		return nil
@@ -361,7 +361,7 @@ func (c *ClusterProvider) doGetCluster(clusterName string, printer printers.Outp
 	}
 
 	if *output.Cluster.Status == awseks.ClusterStatusActive {
-		if logger.Level >= 4 {
+		if logger.Level() >= 4 {
 			spec := &api.ClusterConfig{Metadata: &api.ClusterMeta{Name: clusterName}}
 			stacks, err := c.NewStackManager(spec).ListStacks()
 			if err != nil {

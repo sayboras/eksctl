@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	"github.com/weaveworks/eksctl/pkg/printers"
 	"github.com/weaveworks/eksctl/pkg/utils/kubeconfig"
 	"github.com/weaveworks/eksctl/pkg/version"
@@ -48,36 +48,36 @@ func AddPreRun(cmd *cobra.Command, newFn func(cmd *cobra.Command, args []string)
 	}
 }
 
-// LogIntendedAction calls logger.Info with appropriate prefix
+// LogIntendedAction calls logger.Infof with appropriate prefix
 func LogIntendedAction(plan bool, msgFmt string, args ...interface{}) {
 	prefix := "will "
 	if plan {
 		prefix = "(plan) would "
 	}
-	logger.Info(prefix+msgFmt, args...)
+	logger.Infof(prefix+msgFmt, args...)
 }
 
-// LogCompletedAction calls logger.Success with appropriate prefix
+// LogCompletedAction calls logger.Infof with appropriate prefix
 func LogCompletedAction(plan bool, msgFmt string, args ...interface{}) {
 	prefix := ""
 	if plan {
 		prefix = "(plan) would have "
 	}
-	logger.Success(prefix+msgFmt, args...)
+	logger.Infof(prefix+msgFmt, args...)
 }
 
 // LogPlanModeWarning will log a message to inform user that they are in plan-mode
 func LogPlanModeWarning(plan bool) {
 	if plan {
-		logger.Warning("no changes were applied, run again with '--approve' to apply the changes")
+		logger.Warnf("no changes were applied, run again with '--approve' to apply the changes")
 	}
 }
 
 // LogRegionAndVersionInfo will log the selected region and build version
 func LogRegionAndVersionInfo(meta *api.ClusterMeta) {
 	if meta != nil {
-		logger.Info("eksctl version %s", version.GetVersion())
-		logger.Info("using region %s", meta.Region)
+		logger.Infof("eksctl version %s", version.GetVersion())
+		logger.Infof("using region %s", meta.Region)
 	}
 }
 
@@ -94,7 +94,7 @@ func AddApproveFlag(fs *pflag.FlagSet, cmd *Cmd) {
 // GetNameArg tests to ensure there is only 1 name argument
 func GetNameArg(args []string) string {
 	if len(args) > 1 {
-		logger.Critical("only one argument is allowed to be used as a name")
+		logger.Fatal("only one argument is allowed to be used as a name")
 		os.Exit(1)
 	}
 	if len(args) == 1 {

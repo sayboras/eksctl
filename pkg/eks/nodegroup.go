@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/arn"
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	"github.com/weaveworks/eksctl/pkg/cfn/manager"
 	"github.com/weaveworks/eksctl/pkg/iam"
@@ -35,7 +35,7 @@ func getNodes(clientSet kubernetes.Interface, ng KubeNodeGroup) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	logger.Info("nodegroup %q has %d node(s)", ng.NameString(), len(nodes.Items))
+	logger.Infof("nodegroup %q has %d node(s)", ng.NameString(), len(nodes.Items))
 	counter := 0
 	for _, node := range nodes.Items {
 		// logger.Debug("node[%d]=%#v", n, node)
@@ -44,7 +44,7 @@ func getNodes(clientSet kubernetes.Interface, ng KubeNodeGroup) (int, error) {
 			ready = "ready"
 			counter++
 		}
-		logger.Info("node %q is %s", node.ObjectMeta.Name, ready)
+		logger.Infof("node %q is %s", node.ObjectMeta.Name, ready)
 	}
 	return counter, nil
 }
@@ -178,11 +178,11 @@ func hasAmazonLinux2Node(nodeGroups []KubeNodeGroup) bool {
 func LogWindowsCompatibility(nodeGroups []KubeNodeGroup, clusterMeta *api.ClusterMeta) {
 	if hasWindowsNode(nodeGroups) {
 		if !hasAmazonLinux2Node(nodeGroups) {
-			logger.Warning("a Linux node group is required to support Windows workloads")
-			logger.Warning("add it using 'eksctl create nodegroup --cluster=%s --node-ami-family=%s'", clusterMeta.Name, api.NodeImageFamilyAmazonLinux2)
+			logger.Warn("a Linux node group is required to support Windows workloads")
+			logger.Warnf("add it using 'eksctl create nodegroup --cluster=%s --node-ami-family=%s'", clusterMeta.Name, api.NodeImageFamilyAmazonLinux2)
 		}
-		logger.Warning("Windows VPC resource controller is required to run Windows workloads")
-		logger.Warning("install it using 'eksctl utils install-vpc-controllers --name=%s --region=%s --approve'", clusterMeta.Name, clusterMeta.Region)
+		logger.Warn("Windows VPC resource controller is required to run Windows workloads")
+		logger.Warnf("install it using 'eksctl utils install-vpc-controllers --name=%s --region=%s --approve'", clusterMeta.Name, clusterMeta.Region)
 	}
 }
 
@@ -217,7 +217,7 @@ func (c *ClusterProvider) WaitForNodes(clientSet kubernetes.Interface, ng KubeNo
 		return errors.Wrap(err, "listing nodes")
 	}
 
-	logger.Info("waiting for at least %d node(s) to become ready in %q", minSize, ng.NameString())
+	logger.Infof("waiting for at least %d node(s) to become ready in %q", minSize, ng.NameString())
 	for !timeout && counter < minSize {
 		select {
 		case event := <-watcher.ResultChan():

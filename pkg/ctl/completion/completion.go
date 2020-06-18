@@ -1,8 +1,8 @@
 package completion
 
 import (
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
+	"github.com/weaveworks/eksctl/pkg/logger"
 )
 
 // Command will create the `completion` commands

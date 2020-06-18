@@ -6,8 +6,8 @@ import (
 	"regexp"
 
 	"github.com/google/go-github/v31/github"
-	"github.com/kris-nova/logger"
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	"golang.org/x/oauth2"
 )
 
@@ -39,7 +39,7 @@ func (p *GitHubProvider) Put(ctx context.Context, fluxSSHKey PublicKey) error {
 		return err
 	}
 
-	logger.Info("%s configured with Flux SSH public key\n%s", *key.Title, fluxSSHKey.Key)
+	logger.Infof("%s configured with Flux SSH public key\n%s", *key.Title, fluxSSHKey.Key)
 
 	return nil
 }
@@ -76,7 +76,7 @@ func (p *GitHubProvider) Delete(ctx context.Context) error {
 		return err
 	}
 
-	logger.Info("deleted GitHub deploy key %s", title)
+	logger.Infof("deleted GitHub deploy key %s", title)
 
 	return nil
 }

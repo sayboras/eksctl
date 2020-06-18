@@ -4,8 +4,8 @@ import (
 	"context"
 	"os"
 
-	"github.com/kris-nova/logger"
 	"github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
+	"github.com/weaveworks/eksctl/pkg/logger"
 )
 
 type GitProvider interface {
@@ -32,9 +32,9 @@ func ForCluster(cluster *v1alpha5.ClusterConfig) GitProvider {
 	}
 
 	if owner, repo, ok := getGitHubOwnerRepoFromRepoURL(repoURL); !ok {
-		logger.Info("skipped managing GitHub deploy key for URL %s: Only `git@github.com:OWNER/REPO.git` is accepted for automatic deploy key creation", repoURL)
+		logger.Infof("skipped managing GitHub deploy key for URL %s: Only `git@github.com:OWNER/REPO.git` is accepted for automatic deploy key creation", repoURL)
 	} else if githubToken := os.Getenv(EnvVarGitHubToken); githubToken == "" {
-		logger.Info("GITHUB_TOKEN is not set. Please set it so that eksctl is able to create and delete GitHub deploy key from Flux SSH public key")
+		logger.Infof("GITHUB_TOKEN is not set. Please set it so that eksctl is able to create and delete GitHub deploy key from Flux SSH public key")
 	} else {
 		return &GitHubProvider{
 			cluster:     cluster.Metadata,

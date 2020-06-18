@@ -4,13 +4,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/kris-nova/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
 	"github.com/weaveworks/eksctl/pkg/ctl/cmdutils"
 	"github.com/weaveworks/eksctl/pkg/gitops"
 	"github.com/weaveworks/eksctl/pkg/gitops/flux"
+	"github.com/weaveworks/eksctl/pkg/logger"
 )
 
 type options struct {
@@ -81,16 +81,16 @@ func doEnableRepository(cmd *cmdutils.Cmd) error {
 	fluxIsInstalled, err := installer.IsFluxInstalled()
 	if err != nil {
 		// Continue with installation
-		logger.Warning(err.Error())
+		logger.Warnf(err.Error())
 	} else if fluxIsInstalled {
-		logger.Warning("found existing flux deployment in namespace %q. Skipping installation",
+		logger.Warnf("found existing flux deployment in namespace %q. Skipping installation",
 			cmd.ClusterConfig.Git.Operator.Namespace)
 		return nil
 	}
 
 	userInstructions, err := installer.Run(context.Background())
 	if err != nil {
-		logger.Critical("unable to set up gitops repo: %s", err.Error())
+		logger.Fatalf("unable to set up gitops repo: %s", err.Error())
 		return err
 	}
 

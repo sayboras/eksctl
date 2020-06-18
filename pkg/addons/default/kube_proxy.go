@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 
 	"github.com/weaveworks/eksctl/pkg/printers"
 
@@ -26,7 +26,7 @@ func UpdateKubeProxyImageTag(clientSet kubernetes.Interface, controlPlaneVersion
 	d, err := clientSet.AppsV1().DaemonSets(metav1.NamespaceSystem).Get(KubeProxy, metav1.GetOptions{})
 	if err != nil {
 		if apierrs.IsNotFound(err) {
-			logger.Warning("%q was not found", KubeProxy)
+			logger.Warnf("%q was not found", KubeProxy)
 			return false, nil
 		}
 		return false, errors.Wrapf(err, "getting %q", KubeProxy)
@@ -35,7 +35,7 @@ func UpdateKubeProxyImageTag(clientSet kubernetes.Interface, controlPlaneVersion
 		return false, fmt.Errorf("%s has %d containers, expected at least 1", KubeProxy, numContainers)
 	}
 
-	if err := printer.LogObj(logger.Debug, KubeProxy+" [current] = \\\n%s\n", d); err != nil {
+	if err := printer.LogObj(KubeProxy+" [current] = \\\n%s\n", d); err != nil {
 		return false, err
 	}
 
@@ -50,25 +50,25 @@ func UpdateKubeProxyImageTag(clientSet kubernetes.Interface, controlPlaneVersion
 
 	if imageParts[1] == desiredTag {
 		logger.Debug("imageParts = %v, desiredTag = %s", imageParts, desiredTag)
-		logger.Info("%q is already up-to-date", KubeProxy)
+		logger.Infof("%q is already up-to-date", KubeProxy)
 		return false, nil
 	}
 
 	if plan {
-		logger.Critical("(plan) %q is not up-to-date", KubeProxy)
+		logger.Fatalf("(plan) %q is not up-to-date", KubeProxy)
 		return true, nil
 	}
 
 	imageParts[1] = desiredTag
 	*image = strings.Join(imageParts, ":")
 
-	if err := printer.LogObj(logger.Debug, KubeProxy+" [updated] = \\\n%s\n", d); err != nil {
+	if err := printer.LogObj(KubeProxy+" [updated] = \\\n%s\n", d); err != nil {
 		return false, err
 	}
 	if _, err := clientSet.AppsV1().DaemonSets(metav1.NamespaceSystem).Update(d); err != nil {
 		return false, err
 	}
 
-	logger.Info("%q is now up-to-date", KubeProxy)
+	logger.Infof("%q is now up-to-date", KubeProxy)
 	return false, nil
 }

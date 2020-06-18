@@ -1,8 +1,8 @@
 package kubernetes
 
 import (
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -52,11 +52,11 @@ func MaybeCreateServiceAccountOrUpdateMetadata(clientSet Interface, meta metav1.
 		if err != nil {
 			return err
 		}
-		logger.Info("created serviceaccount %q", name)
+		logger.Infof("created serviceaccount %q", name)
 		return nil
 	}
 
-	logger.Info("serviceaccount %q already exists", name)
+	logger.Infof("serviceaccount %q already exists", name)
 
 	current, err := clientSet.CoreV1().ServiceAccounts(meta.Namespace).Get(meta.Name, metav1.GetOptions{})
 	if err != nil {
@@ -84,14 +84,14 @@ func MaybeCreateServiceAccountOrUpdateMetadata(clientSet Interface, meta metav1.
 	mergeMetadata(meta.Labels, current.Labels)
 
 	if !updateRequired {
-		logger.Info("serviceaccount %q is already up-to-date", name)
+		logger.Infof("serviceaccount %q is already up-to-date", name)
 		return nil
 	}
 	_, err = clientSet.CoreV1().ServiceAccounts(meta.Namespace).Update(current)
 	if err != nil {
 		return err
 	}
-	logger.Info("updated serviceaccount %q", name)
+	logger.Infof("updated serviceaccount %q", name)
 	return nil
 }
 
@@ -103,13 +103,13 @@ func MaybeDeleteServiceAccount(clientSet Interface, meta metav1.ObjectMeta) erro
 		return err
 	}
 	if !exists {
-		logger.Info("serviceaccount %q was already deleted", name)
+		logger.Infof("serviceaccount %q was already deleted", name)
 		return nil
 	}
 	err = clientSet.CoreV1().ServiceAccounts(meta.Namespace).Delete(meta.Name, &metav1.DeleteOptions{})
 	if err != nil {
 		return err
 	}
-	logger.Info("deleted serviceaccount %q", name)
+	logger.Infof("deleted serviceaccount %q", name)
 	return nil
 }

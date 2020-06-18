@@ -3,12 +3,12 @@ package create
 import (
 	"fmt"
 
-	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/weaveworks/eksctl/pkg/cfn/manager"
 	"github.com/weaveworks/eksctl/pkg/eks"
+	"github.com/weaveworks/eksctl/pkg/logger"
 	"github.com/weaveworks/eksctl/pkg/ssh"
 	"github.com/weaveworks/eksctl/pkg/utils/names"
 	"github.com/weaveworks/eksctl/pkg/vpc"
@@ -135,7 +135,7 @@ func doCreateNodeGroups(cmd *cmdutils.Cmd, ng *api.NodeGroup, params createNodeG
 		if err := eks.EnsureAMI(ctl.Provider, meta.Version, ng); err != nil {
 			return err
 		}
-		logger.Info("nodegroup %q will use %q [%s/%s]", ng.Name, ng.AMI, ng.AMIFamily, cfg.Metadata.Version)
+		logger.Infof("nodegroup %q will use %q [%s/%s]", ng.Name, ng.AMI, ng.AMIFamily, cfg.Metadata.Version)
 
 		// load or use SSH key - name includes cluster name and the
 		// fingerprint, so if unique keys provided, each will get
@@ -155,7 +155,7 @@ func doCreateNodeGroups(cmd *cmdutils.Cmd, ng *api.NodeGroup, params createNodeG
 		return err
 	}
 
-	if err := printer.LogObj(logger.Debug, "cfg.json = \\\n%s\n", cfg); err != nil {
+	if err := printer.LogObj("cfg.json = \\\n%s\n", cfg); err != nil {
 		return err
 	}
 
@@ -171,7 +171,7 @@ func doCreateNodeGroups(cmd *cmdutils.Cmd, ng *api.NodeGroup, params createNodeG
 	{
 		logFiltered()
 		logMsg := func(resource string, count int) {
-			logger.Info("will create a CloudFormation stack for each of %d %s in cluster %q", count, resource, cfg.Metadata.Name)
+			logger.Infof("will create a CloudFormation stack for each of %d %s in cluster %q", count, resource, cfg.Metadata.Name)
 		}
 		if len(cfg.NodeGroups) > 0 {
 			logMsg("nodegroups", len(cfg.NodeGroups))
@@ -201,14 +201,14 @@ func doCreateNodeGroups(cmd *cmdutils.Cmd, ng *api.NodeGroup, params createNodeG
 		}
 
 		tasks.Append(allNodeGroupTasks)
-		logger.Info(tasks.Describe())
+		logger.Infof(tasks.Describe())
 		errs := tasks.DoAllSync()
 		if len(errs) > 0 {
-			logger.Info("%d error(s) occurred and nodegroups haven't been created properly, you may wish to check CloudFormation console", len(errs))
-			logger.Info("to cleanup resources, run 'eksctl delete nodegroup --region=%s --cluster=%s --name=<name>' for each of the failed nodegroup", cfg.Metadata.Region, cfg.Metadata.Name)
+			logger.Infof("%d error(s) occurred and nodegroups haven't been created properly, you may wish to check CloudFormation console", len(errs))
+			logger.Infof("to cleanup resources, run 'eksctl delete nodegroup --region=%s --cluster=%s --name=<name>' for each of the failed nodegroup", cfg.Metadata.Region, cfg.Metadata.Name)
 			for _, err := range errs {
 				if err != nil {
-					logger.Critical("%s\n", err.Error())
+					logger.Fatalf("%s\n", err.Error())
 				}
 			}
 			return fmt.Errorf("failed to create nodegroups for cluster %q", cfg.Metadata.Name)
@@ -222,14 +222,14 @@ func doCreateNodeGroups(cmd *cmdutils.Cmd, ng *api.NodeGroup, params createNodeG
 		}
 
 		tasks := ctl.ClusterTasksForNodeGroups(cfg, params.installNeuronDevicePlugin)
-		logger.Info(tasks.Describe())
+		logger.Infof(tasks.Describe())
 		errs := tasks.DoAllSync()
 		if len(errs) > 0 {
-			logger.Info("%d error(s) occurred and nodegroups haven't been created properly, you may wish to check CloudFormation console", len(errs))
-			logger.Info("to cleanup resources, run 'eksctl delete nodegroup --region=%s --cluster=%s --name=<name>' for each of the failed nodegroups", cfg.Metadata.Region, cfg.Metadata.Name)
+			logger.Infof("%d error(s) occurred and nodegroups haven't been created properly, you may wish to check CloudFormation console", len(errs))
+			logger.Infof("to cleanup resources, run 'eksctl delete nodegroup --region=%s --cluster=%s --name=<name>' for each of the failed nodegroups", cfg.Metadata.Region, cfg.Metadata.Name)
 			for _, err := range errs {
 				if err != nil {
-					logger.Critical("%s\n", err.Error())
+					logger.Fatalf("%s\n", err.Error())
 				}
 			}
 			return fmt.Errorf("failed to create nodegroups for cluster %q", cfg.Metadata.Name)
@@ -250,7 +250,7 @@ func doCreateNodeGroups(cmd *cmdutils.Cmd, ng *api.NodeGroup, params createNodeG
 
 			showDevicePluginMessageForNodeGroup(ng, params.installNeuronDevicePlugin)
 		}
-		logger.Success("created %d nodegroup(s) in cluster %q", len(cfg.NodeGroups), cfg.Metadata.Name)
+		logger.Infof("created %d nodegroup(s) in cluster %q", len(cfg.NodeGroups), cfg.Metadata.Name)
 
 		for _, ng := range cfg.ManagedNodeGroups {
 			if err := ctl.WaitForNodes(clientSet, ng); err != nil {
@@ -258,11 +258,11 @@ func doCreateNodeGroups(cmd *cmdutils.Cmd, ng *api.NodeGroup, params createNodeG
 			}
 		}
 
-		logger.Success("created %d managed nodegroup(s) in cluster %q", len(cfg.ManagedNodeGroups), cfg.Metadata.Name)
+		logger.Infof("created %d managed nodegroup(s) in cluster %q", len(cfg.ManagedNodeGroups), cfg.Metadata.Name)
 	}
 
 	if err := ctl.ValidateExistingNodeGroupsForCompatibility(cfg, stackManager); err != nil {
-		logger.Critical("failed checking nodegroups", err.Error())
+		logger.Fatalf("failed checking nodegroups", err.Error())
 	}
 
 	return nil
