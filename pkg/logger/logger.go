@@ -15,7 +15,7 @@ var (
 			TimeKey:     "time",
 			EncodeTime:  zapcore.ISO8601TimeEncoder,
 			LevelKey:    "level",
-			EncodeLevel: zapcore.CapitalLevelEncoder,
+			EncodeLevel: zapcore.CapitalColorLevelEncoder,
 		},
 	}
 )
