@@ -32,7 +32,7 @@ require (
 	github.com/kris-nova/lolgopher v0.0.0-20180921204813-313b3abb0d9b // indirect
 	github.com/kubicorn/kubicorn v0.0.0-20180829191017-06f6bce92acc
 	github.com/lithammer/dedent v1.1.0
-	github.com/onsi/ginkgo v1.12.3
+	github.com/onsi/ginkgo v1.14.0
 	github.com/onsi/gomega v1.10.1
 	github.com/pelletier/go-toml v1.6.0
 	github.com/pkg/errors v0.9.1
