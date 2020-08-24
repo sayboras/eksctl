@@ -7,7 +7,7 @@ go 1.14
 require (
 	github.com/Azure/go-autorest/autorest v0.10.0 // indirect
 	github.com/Azure/go-autorest/autorest/azure/auth v0.4.2 // indirect
-	github.com/aws/aws-sdk-go v1.30.11
+	github.com/aws/aws-sdk-go v1.30.16
 	github.com/benjamintf1/unmarshalledmatchers v0.0.0-20190408201839-bb1c1f34eaea
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/bxcodec/faker v2.0.1+incompatible
@@ -29,7 +29,6 @@ require (
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/kevinburke/go-bindata v3.15.0+incompatible
 	github.com/kevinburke/rest v0.0.0-20200429221318-0d2892b400f8 // indirect
-	github.com/kr/fs v0.1.0 // indirect
 	github.com/kris-nova/logger v0.0.0-20181127235838-fd0d87064b06
 	github.com/kris-nova/lolgopher v0.0.0-20180921204813-313b3abb0d9b // indirect
 	github.com/kubicorn/kubicorn v0.0.0-20180829191017-06f6bce92acc
@@ -54,16 +53,16 @@ require (
 	github.com/weaveworks/launcher v0.0.2-0.20200715141516-1ca323f1de15
 	github.com/whilp/git-urls v0.0.0-20191001220047-6db9661140c0
 	golang.org/x/tools v0.0.0-20200502202811-ed308ab3e770
-	k8s.io/api v0.16.8
-	k8s.io/apiextensions-apiserver v0.16.8
-	k8s.io/apimachinery v0.16.8
-	k8s.io/cli-runtime v0.16.8
+	k8s.io/api v0.18.1
+	k8s.io/apiextensions-apiserver v0.18.0
+	k8s.io/apimachinery v0.18.1
+	k8s.io/cli-runtime v0.18.1
 	k8s.io/client-go v11.0.0+incompatible
 	k8s.io/cloud-provider v0.16.8
 	k8s.io/code-generator v0.16.8
-	k8s.io/kops v1.15.2
+	k8s.io/kops v1.18.0
 	k8s.io/kubelet v0.16.8
-	k8s.io/kubernetes v1.16.8
+	k8s.io/kubernetes v1.17.0
 	k8s.io/legacy-cloud-providers v0.16.8
 	sigs.k8s.io/aws-iam-authenticator v0.5.0
 	sigs.k8s.io/yaml v1.2.0
